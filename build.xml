@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project name="MatchHack" basedir="." default="full-build">
+    
+    <!-- identify properties file -->
+    <property file="build.properties" />
+
+    <!-- Set up FlexUnit Ant tasks -->
+    <taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks.jar" />
+
+    <!-- Add the ant-contrib tasks -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${lib.loc}/ant-contrib.jar" />
+
+
+    <import file="${includes.loc}/misc.xml" />
+    <import file="${includes.loc}/package-air.xml" />
+    <import file="${includes.loc}/compile-swf.xml" />
+    <import file="${includes.loc}/android.xml" />
+    <import file="${includes.loc}/chrome.xml" />
+    <import file="${includes.loc}/ios.xml" />
+
+    <target name="usage" depends="misc.usage" description="Prints usage message" />
+
+    <target name="compile" description="Compiles the project as a swf">
+        <runtarget target="compile-swf.compile" />
+    </target>
+
+    <target name="full-build" depends="compile" description="Runs tests, compiles project, and optionally runs it.">
+        <if>
+            <istrue value="${autolaunch.url}"/>
+            <then><runtarget target="compile-swf.local-run"/></then>
+        </if>
+    </target>
+
+    <target name="package-apk" description="Packages up project for deployment to android">
+        <var name="mobile" value="true" />
+        <runtarget target="compile" />
+        <runtarget target="android.package-apk" />
+    </target>
+
+    <target name="deploy-to-emulator" depends="package-apk,android.deploy-to-emulator" />
+
+    <target name="deploy-to-phone" depends="package-apk,android.deploy-to-device" />
+
+    <target name="package-ipa" description="Packages up project for deployment to android">
+        <var name="mobile" value="true" />
+        <runtarget target="compile" />
+        <runtarget target="ios.package-ipa" />
+    </target>
+
+    <target name="package-chrome-app" description="Packages up project for deployment to Chrome Market">
+        <var name="mobile" value="false" />
+        <runtarget target="compile" />
+        <runtarget target="chrome.package-chrome-app" />
+    </target>
+</project>

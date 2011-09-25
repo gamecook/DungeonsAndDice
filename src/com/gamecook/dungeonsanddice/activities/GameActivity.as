@@ -24,6 +24,11 @@
 package com.gamecook.dungeonsanddice.activities
 {
     import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
+    import com.gamecook.dungeonsanddice.views.DiceView;
+    import com.gamecook.dungeonsanddice.views.DiceView;
+    import com.gamecook.dungeonsanddice.views.DiceView;
+    import com.gamecook.dungeonsanddice.views.DiceView;
+    import com.gamecook.dungeonsanddice.views.DiceView;
     import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.equipment.IEquipable;
     import com.gamecook.frogue.sprites.SpriteSheet;
@@ -101,7 +106,10 @@ package com.gamecook.dungeonsanddice.activities
         private var playerDiceInstances:Array = [];
         private var monsterDiceInstances:Array = [];
         private var diceSpriteSheet:SpriteSheet;
-        private var playerDiceContainer:DisplayObject;
+        private var playerDiceContainer:Sprite;
+        private var monsterDiceContainer:Sprite;
+        private var round:int = 0;
+        private var maxRounds:int = 2;
 
         public function GameActivity(activityManager:IActivityManager, data:*)
         {
@@ -133,10 +141,10 @@ package com.gamecook.dungeonsanddice.activities
 
             activeState.initialScore = activeState.score;
 
-            var hand1 : Array = makeRandomHand();
-            trace("First Hand", hand1);
+            //var hand1 : Array = makeRandomHand();
+            //trace("First Hand", hand1);
 
-            createPlayerDice();
+
 
             /*var types : Array = new Array("High Card", "One Pair", "Two Pair", "Three of a Kind", "Full House", "Straight", "Four of a Kind", "Five of a Kind");
 			for (var run : Number = 0;run < 5; run++) {
@@ -263,10 +271,12 @@ package com.gamecook.dungeonsanddice.activities
                 monsterCounter = monsterAttackDelay;
             }
 
+            createPlayerDice();
+            createMonsterDice();
+
             addChild(menuBar);
 
-
-            addChild(new Bitmap(diceSpriteSheet.getSprite("sprite0")));
+            player.addEventListener(MouseEvent.CLICK, onClick);
 
         }
 
@@ -288,29 +298,48 @@ package com.gamecook.dungeonsanddice.activities
 
         private function createPlayerDice():void
         {
-            playerDiceContainer = addChild(new Sprite());
+            playerDiceContainer = addChild(new Sprite()) as Sprite;
+            createDiceGroup(playerDiceContainer, playerDiceInstances);
+            playerDiceContainer.x = 40;
+            playerDiceContainer.y =320;
+        }
+
+        private function createMonsterDice():void
+        {
+            monsterDiceContainer = addChild(new Sprite()) as Sprite;
+            createDiceGroup(monsterDiceContainer, monsterDiceInstances);
+            monsterDiceContainer.x = 40;
+            monsterDiceContainer.y = 135;
+        }
+
+        private function createDiceGroup(container:Sprite, instanceCollection:Array):void
+        {
             var total:int = 5;
             var i:int;
-            var dice:Sprite;
-
+            var dice:DiceView;
+            var padding:int = 4;
             for (i = 0; i < total; i++)
             {
+                dice = container.addChild(new DiceView(diceSpriteSheet)) as DiceView;
+                dice.x = (dice.width+padding) * i;
 
+                instanceCollection.push(dice);
             }
         }
 
-        private function makeRandomHand(total:int = 5) : Array {
-			var hand : Array = [];
+        private function rollDice(collection:Array):void
+        {
+            var total:int = collection.length;
+            var i:int;
+            var dice:DiceView;
 
-            for (var i:int = 0; i < total; i++)
-                hand.push(diceRoll());
-
-			return hand;
-		}
-
-		private function diceRoll() : int {
-			return ((Math.random() * 1000) % 6) + 1;
-		}
+            for(i = 0; i < total; i++)
+            {
+                dice = collection[i]
+                if(!dice.selected)
+                    dice.roll();
+            }
+        }
 
         private function createPlayer(total:int):void
         {
@@ -462,8 +491,46 @@ package com.gamecook.dungeonsanddice.activities
             // Clear status message
             statusBar.setMessage("");
 
+            resetMonsterAttackCounter();
+
+            if(round < maxRounds)
+            {
+                rollDice(playerDiceInstances);
+                rollDice(monsterDiceInstances);
+                var rank1 : Object = DicePokerValidationUtil.rankHand(getDiceValues(playerDiceInstances));
+                var rank2 : Object = DicePokerValidationUtil.rankHand(getDiceValues(monsterDiceInstances));
+
+                updateStatusMessage("Round "+(round+1)+": Player 1 has "+rank1.type+" ("+rank1.rank+")\n Monster has " +rank2.type+" ("+rank2.rank+")");
+                round++;
+            }
+            else
+            {
+                var rank1 : Object = DicePokerValidationUtil.rankHand(getDiceValues(playerDiceInstances));
+                var rank2 : Object = DicePokerValidationUtil.rankHand(getDiceValues(monsterDiceInstances));
+
+                resetRound();
+
+                if(rank1.rank > rank2.rank)
+                {
+
+                    increaseBonus();
+                    attack(player, monster);
+                }
+                else
+                {
+                    resetBonus();
+                    attack(monster, player);
+                }
+
+                if (monster.isDead)
+                    onMonsterDead();
+                else if(player.isDead)
+                    onPlayerDead();
+
+
+            }
             // Test to see if a tile is flipping
-            if (!flipping)
+            /*if (!flipping)
             {
                 // Play flip sound
                 soundManager.play(MHSoundClasses.WallHit);
@@ -502,7 +569,36 @@ package com.gamecook.dungeonsanddice.activities
                     endTurn();
                 }
 
+            }*/
+
+        }
+
+        private function resetRound():void
+        {
+            round = 0;
+            //TODO this should be a constant and not rely on the player/monster dice arrays tobe the same.
+            var total:int = playerDiceInstances.length;
+            var i:int;
+            for (i =0; i<total; i++)
+            {
+                DiceView(playerDiceInstances[i]).reset();
+                DiceView(monsterDiceInstances[i]).reset();
             }
+        }
+
+        private function getDiceValues(collection:Array):Array
+        {
+            var values:Array = [];
+
+            var total:int = collection.length;
+            var i:int;
+
+            for (i = 0; i < total; i++)
+            {
+                values.push(DiceView(collection[i]).value);
+            }
+
+            return values;
 
         }
 
@@ -655,12 +751,16 @@ package com.gamecook.dungeonsanddice.activities
             // Update status before testing if the player is dead
             updateStatusBar();
 
-            // Reset monster attack counter
-            monsterCounter = monsterAttackDelay;
-
+            resetMonsterAttackCounter();
             // Test to see if the player is dead
             if (player.isDead)
                 onPlayerDead();
+        }
+
+        private function resetMonsterAttackCounter():void
+        {
+            // Reset monster attack counter
+            monsterCounter = monsterAttackDelay;
         }
 
         private function resetBonus():void
@@ -714,17 +814,17 @@ package com.gamecook.dungeonsanddice.activities
 
             }
 
-            playerAttack();
+            //playerAttack();
 
             // Reset monster attack counter
             monsterCounter = monsterAttackDelay;
         }
 
-        private function playerAttack():void
+        private function attack(attacker:CharacterView, target:CharacterView):void
         {
             if (quakeEffect)
             {
-                quakeEffect.target = monster;
+                quakeEffect.target = target;
                 addThread(quakeEffect);
             }
 
@@ -732,7 +832,7 @@ package com.gamecook.dungeonsanddice.activities
             increaseBonus();
 
             // Take away 1 HP from the monster
-            monster.subtractLife(1);
+            target.subtractLife(1);
 
             // Play attack sound
             soundManager.play(MHSoundClasses.PotionSound);
@@ -745,9 +845,6 @@ package com.gamecook.dungeonsanddice.activities
             // Update status before testing for monster being dead
             updateStatusBar();
 
-            // Test to see if the monster is dead
-            if (monster.isDead)
-                onMonsterDead();
         }
 
         private function displayBonusMessage(value:String):void

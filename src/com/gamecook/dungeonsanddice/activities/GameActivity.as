@@ -24,6 +24,7 @@
 package com.gamecook.dungeonsanddice.activities
 {
     import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
+    import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
     import com.gamecook.dungeonsanddice.views.DiceView;
     import com.gamecook.dungeonsanddice.views.DiceView;
     import com.gamecook.dungeonsanddice.views.DiceView;
@@ -514,12 +515,12 @@ package com.gamecook.dungeonsanddice.activities
                 {
 
                     increaseBonus();
-                    attack(player, monster);
+                    attack(player, monster, rank1.typeID);
                 }
                 else
                 {
                     resetBonus();
-                    attack(monster, player);
+                    attack(monster, player, rank2.typeID);
                 }
 
                 if (monster.isDead)
@@ -820,7 +821,7 @@ package com.gamecook.dungeonsanddice.activities
             monsterCounter = monsterAttackDelay;
         }
 
-        private function attack(attacker:CharacterView, target:CharacterView):void
+        private function attack(attacker:CharacterView, target:CharacterView, bonus:int = 1):void
         {
             if (quakeEffect)
             {
@@ -832,13 +833,18 @@ package com.gamecook.dungeonsanddice.activities
             increaseBonus();
 
             // Take away 1 HP from the monster
-            target.subtractLife(1);
+            if(bonus <= 0)
+                bonus = 1;
+
+            target.subtractLife(1+bonus);
 
             // Play attack sound
             soundManager.play(MHSoundClasses.PotionSound);
 
             // Update status message
-            updateStatusMessage("You have found a match!\nThe monster loses 1 HP from your attack.");
+            updateStatusMessage(attacker.name+" hits "+target.name+" for "+(1+bonus)+"HP points with a "+DicePokerValidationUtil.getType(bonus));
+
+            trace("Attack Message", attacker.name+" hits "+target.name+" for "+(1+bonus)+"HP points with a "+DicePokerValidationUtil.getType(bonus));
 
             activeState.score += 1 + bonus;
 

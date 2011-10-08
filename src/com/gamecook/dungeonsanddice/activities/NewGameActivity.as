@@ -99,7 +99,7 @@ package com.gamecook.dungeonsanddice.activities
             difficultyImage.x = (fullSizeWidth - difficultyImage.width) * .5;
             difficultyImage.y = hardButton.y + hardButton.height + 30;
 
-            enableLogo();
+            displayContextualButton();
         }
 
         /**

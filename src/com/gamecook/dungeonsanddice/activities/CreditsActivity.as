@@ -33,6 +33,9 @@ package com.gamecook.dungeonsanddice.activities
         [Embed(source="../../../../../build/assets/credits.png")]
         private var CreditsImage:Class;
 
+        [Embed(source="../../../../../build/assets/sponsors.png")]
+        private var SponsorsImage:Class;
+
         public function CreditsActivity(activityManager:IActivityManager, data:*)
         {
             super(activityManager, data);
@@ -44,11 +47,16 @@ package com.gamecook.dungeonsanddice.activities
 
             // Setup Credits image and lay it out
             var credits:Bitmap = addChild(Bitmap(new CreditsImage())) as Bitmap;
-            credits.x = (fullSizeWidth - credits.width) * .5;
-            credits.y = (fullSizeHeight - credits.height) - 5;
+            credits.x = ((BACKGROUND_WIDTH - credits.width) * .5)+HUD_WIDTH
+            credits.y = (fullSizeHeight - credits.height) * .5;
+
+            // Setup Credits image and lay it out
+            var sponsors:Bitmap = addChild(Bitmap(new SponsorsImage())) as Bitmap;
+            sponsors.x = (HUD_WIDTH - sponsors.width) * .5;
+            sponsors.y = HUD_MESSAGE_Y + 5;
 
             // Enable the logo to go back
-            enableLogo();
+            displayContextualButton();
 
             // create a time delay to show the StartActivity
             startNextActivityTimer(StartActivity, 10);

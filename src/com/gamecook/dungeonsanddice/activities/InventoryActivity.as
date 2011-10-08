@@ -49,8 +49,7 @@ package com.gamecook.dungeonsanddice.activities
         public var tileSize:int = 64;
         private var bitmapData:BitmapData;
         private var coinContainer:Bitmap;
-        private var playerSprite:Bitmap;
-        private var offset:int = 190;
+        private var offset:int = 55;
         private var unlockedPercent:Number = 0;
         private var statsTF:TextField;
 
@@ -65,11 +64,9 @@ package com.gamecook.dungeonsanddice.activities
 
             super.onCreate();
 
-
             var inventoryText:Bitmap = addChild(new InventoryText()) as Bitmap;
-            inventoryText.x = (fullSizeWidth - inventoryText.width) * .5;
-            inventoryText.y = 53;
-
+            inventoryText.x = (HUD_WIDTH - inventoryText.width) * .5;
+            inventoryText.y = 65;
 
             textFieldStamp = new TextField();
             textFieldStamp.autoSize = TextFieldAutoSize.LEFT;
@@ -82,29 +79,20 @@ package com.gamecook.dungeonsanddice.activities
 
             // DEBUG Code
             SpriteSheetFactory.parseSpriteSheet(spriteSheet);
-            // Remove
-
-
-
-            //TODO need to add support for equipment logic
-            playerSprite = addChild(new Bitmap()) as Bitmap;
-            playerSprite.x = 10;
-            playerSprite.y = inventoryText.y + inventoryText.height + 5;
-            updatePlayerDisplay();
 
             createCoinDisplay();
 
             statsTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, formatStatsText(), 160)) as TextField;
-            statsTF.x = playerSprite.x + playerSprite.width;
-            statsTF.y = playerSprite.y;
+            statsTF.x = coinContainer.x + coinContainer.width + HUD_PADDING;
+            statsTF.y = coinContainer.y;
 
             scrollerContainer = addChild(new Sprite()) as Sprite;
 
             var unlockedLabel:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLarge, "Items Unlocked ", fullSizeWidth)) as TextField;
             unlockedLabel.x = 10;
-            unlockedLabel.y = playerSprite.y + playerSprite.height;
+            /*unlockedLabel.y = playerSprite.y + playerSprite.height;*/
 
-            offset = unlockedLabel.y + unlockedLabel.height + 10;
+            offset = 55;
 
             createScrubber();
             //Generate Bitmap Data
@@ -120,18 +108,24 @@ package com.gamecook.dungeonsanddice.activities
             createEaseScrollBehavior();
 
             scrollerContainer.rotation = 90;
-            scrollerContainer.x = fullSizeWidth;
+            scrollerContainer.x = fullSizeHeight + (HUD_WIDTH - (HUD_PADDING + 10));
             scrollerContainer.y = offset;
 
             addEventListener(MouseEvent.CLICK, onClick)
         }
 
+        override public function onStart():void
+        {
+            super.onStart();
+            displayContextualButton();
+        }
+
         private function formatStatsText():String
         {
             var message:String =
+                    "<span >Stats:</span>\n"+
                     "<span class='lightGrey'>Wins:</span>\n<span class='green'>" + activeState.totalWins + "</span>\n" +
-                    "<span class='lightGrey'>Losses:</span>\n<span class='red'>" + activeState.totalLosses + "</span>\n" +
-                    "<span class='lightGrey'>Turns:</span>\n" + activeState.totalTurns;
+                    "<span class='lightGrey'>Losses:</span>\n<span class='red'>" + activeState.totalLosses + "</span>\n";
             return message;
         }
 
@@ -155,7 +149,7 @@ package com.gamecook.dungeonsanddice.activities
                 sprites.push(TileTypes.getTileSprite(activeState.equippedInventory[SlotsEnum.WEAPON]));
 
 
-            playerSprite.bitmapData = spriteSheet.getSprite.apply(this, sprites);
+            /*playerSprite.bitmapData = spriteSheet.getSprite.apply(this, sprites);*/
         }
 
         private function createCoinDisplay():void
@@ -168,25 +162,23 @@ package com.gamecook.dungeonsanddice.activities
 
             var sprites:Array = ["C1","C2","C3"];
             var i:int;
-            var bitmap:Bitmap;
 
             for (i = 0; i < 3; i++)
             {
                 var matrix:Matrix = new Matrix();
                 matrix.scale(.5, .5)
-                matrix.translate(40 * i, 16);
+                matrix.translate(40 * i, 12);
                 coinContainer.bitmapData.draw(spriteSheet.getSprite(TileTypes.getTileSprite(sprites[i])), matrix);
 
                 var total:int = activeState.getCoins()[sprites[i]];
                 textFieldStamp.text = total == 0 ? "0" : total.toString();
                 matrix = new Matrix();
-                matrix.translate(40 * i + ((32 - textFieldStamp.width) * .5), textFieldStamp.height + 34);
+                matrix.translate(40 * i + ((32 - textFieldStamp.width) * .5), textFieldStamp.height + 30);
                 bmd.draw(textFieldStamp, matrix);
 
                 totalMoney += total * (i + 1);
             }
-            coinContainer.x = fullSizeWidth - coinContainer.width - 10;
-            coinContainer.y = playerSprite.y + 5;
+            coinContainer.x = HUD_WIDTH + HUD_PADDING;
 
             textFieldStamp.textColor = 0xf1f102;
             textFieldStamp.text = "COINS: $" + totalMoney;
@@ -269,14 +261,14 @@ package com.gamecook.dungeonsanddice.activities
             var i:int = 0;
             var total:int = sprites.length;
             var padding:int = 20;
-            var inventoryWidth:int = fullSizeWidth - 20;
-            var columns:int = 2;//Math.ceil(inventoryWidth / tileSize) - 1;
+            var inventoryWidth:int = BACKGROUND_WIDTH - 20;
+            var columns:int = 2;
             var rows:int = Math.ceil(total / columns);
 
             // calculate left/right margin for each item
             var leftMargin:int = 0;
-            var rightMargin:int = 30;//Math.round((inventoryWidth - 10 - ((tileSize + padding) * columns))/columns);
-            trace("rightMargin", rightMargin / columns);
+            var rightMargin:int = 30;
+
             var currentPage:BitmapData = new BitmapData(inventoryWidth, ((tileSize + padding) * rows) + 10, true, 0);
             var currentColumn:int = 0;
             var currentRow:int = 0;
@@ -285,7 +277,9 @@ package com.gamecook.dungeonsanddice.activities
             var unlockedEquipment:Array = activeState.getUnlockedEquipment();
             var newX:int;
             var newY:int;
+
             textFieldStamp.textColor = 0xffffff;
+
             for (i = 0; i < total; i++)
             {
                 currentColumn = i % columns;
@@ -299,14 +293,18 @@ package com.gamecook.dungeonsanddice.activities
 
                 instancesRects[sprites[i]] = new Rectangle(newX, newY, tileSize, tileSize);
 
-                //TODO test if item is found
+                // test if item is found
                 if (unlockedEquipment.indexOf(sprites[i]) == -1)
                 {
-                    foundColorMatrix.alphaMultiplier = .2;
+                    foundColorMatrix.blueOffset =
+                    foundColorMatrix.redOffset =
+                    foundColorMatrix.greenOffset = -180;
                 }
                 else
                 {
-                    foundColorMatrix.alphaMultiplier = 1;
+                    foundColorMatrix.blueOffset =
+                    foundColorMatrix.redOffset =
+                    foundColorMatrix.greenOffset = 0;
                     unlocked ++;
                 }
 
@@ -326,7 +324,6 @@ package com.gamecook.dungeonsanddice.activities
             unlockedPercent = Math.round(unlocked / total * 100);
 
             // Rotate the bitmap for the scroller
-
             var rotatedBMD:BitmapData = new BitmapData(currentPage.height, currentPage.width, true, 0);
             var rotatedMatrix:Matrix = new Matrix();
             rotatedMatrix.rotate(Math.PI * 2 * (-90 / 360));
@@ -338,16 +335,6 @@ package com.gamecook.dungeonsanddice.activities
 
         }
 
-        override public function onStart():void
-        {
-            super.onStart();
-
-            var menuBar:MenuBar = addChild(new MenuBar(MenuBar.EXIT_ONLY_MODE, logo.width, this)) as MenuBar;
-            menuBar.x = logo.x;
-            menuBar.y = logo.y + logo.height - 2;
-            enableLogo();
-        }
-
         private function createScrubber():void
         {
             var sWidth:int = fullSizeHeight - offset;
@@ -356,7 +343,7 @@ package com.gamecook.dungeonsanddice.activities
             var corners:int = 0;
 
             slider = new Slider(sWidth, sHeight, dWidth, corners, 0);
-            //slider.y = fullSizeHeight - slider.height - 20;
+            slider.y = - 10;
 
             slider.addEventListener(Event.CHANGE, onSliderValueChange)
             scrollerContainer.addChild(slider);

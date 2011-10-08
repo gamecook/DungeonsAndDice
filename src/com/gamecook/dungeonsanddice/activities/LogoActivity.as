@@ -94,7 +94,7 @@ package com.gamecook.dungeonsanddice.activities
          * Call this to turn the Logo into a Back Button.
          *
          */
-        protected function enableLogo():void
+        protected function displayContextualButton():void
         {
             logoContainer.useHandCursor = true;
             logoContainer.buttonMode = true;

@@ -38,9 +38,17 @@ package com.gamecook.dungeonsanddice.activities
      */
     public class LogoActivity extends BaseActivity
     {
+        public static const HUD_WIDTH:int = 174;
+        public static const HUD_PADDING:int = 14;
+        public static const HUD_MESSAGE_Y:int = 180;
+        public static const BACKGROUND_WIDTH:int = 226;
 
         [Embed(source="../../../../../build/assets/logo.png")]
         private var LogoImage:Class;
+
+        [Embed(source="../../../../../build/assets/hud_background.png")]
+        private var HudBackground:Class;
+
         protected var logo:Bitmap;
         protected var logoContainer:Sprite;
         protected var activeState:ActiveGameState;
@@ -57,6 +65,7 @@ package com.gamecook.dungeonsanddice.activities
             graphics.drawRect(0, 0, fullSizeWidth, fullSizeHeight);
             graphics.endFill();
 
+            addChild(Bitmap(new HudBackground()));
             // Sets up the ActiveGameState object
             activeState = new ActiveGameState();
             activeState.load();
@@ -68,8 +77,10 @@ package com.gamecook.dungeonsanddice.activities
         {
             super.onStart();
 
+            //TODO remove dependency on Logo Container.
             // Creates a container for the logo
             logoContainer = addChild(new Sprite()) as Sprite;
+            logoContainer.visible = false;
 
             // Attaches the logo
             logo = logoContainer.addChild(Bitmap(new LogoImage())) as Bitmap;

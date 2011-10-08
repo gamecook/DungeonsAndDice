@@ -38,7 +38,7 @@ package
     import flash.text.TextField;
     import flash.ui.Keyboard;
 
-    [SWF(width="480",height="700",backgroundColor="#000000",frameRate="60")]
+    [SWF(width="800",height="480",backgroundColor="#000000",frameRate="60")]
     public class DungeonsAndDice extends AbstractApplication
     {
 
@@ -78,7 +78,7 @@ package
             //TODO need to add in logic to track versions
 
             // Automatically figures out the scale based on stage's height. Used to scale up on each device.
-            scale = DeviceUtil.getScreenHeight(stage) / 410;
+            scale = DeviceUtil.getScreenWidth(stage) / 400;
 
             // Google Analytics Tracker
             tracker = new GoogleTracker(this, key, "AS3", false);

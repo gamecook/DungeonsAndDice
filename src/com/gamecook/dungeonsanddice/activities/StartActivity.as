@@ -87,12 +87,12 @@ package com.gamecook.dungeonsanddice.activities
             super.onStart();
 
             var welcomeImage:Bitmap = addChild(new WelcomeImage()) as Bitmap;
-            welcomeImage.x = (fullSizeWidth - welcomeImage.width) * .5;
-            welcomeImage.y = logo.y + logo.height + 10;
+            welcomeImage.x = (HUD_WIDTH - welcomeImage.width) * .5;
+            welcomeImage.y = HUD_MESSAGE_Y + HUD_PADDING;
 
             var newGameBTN:SimpleButton = addChild(new SimpleButton(new NewGameUp(), new NewGameOver(), new NewGameOver(), new NewGameUp())) as SimpleButton;
-            newGameBTN.x = (fullSizeWidth - newGameBTN.width) * .5;
-            newGameBTN.y = welcomeImage.y + welcomeImage.height + 10;
+            newGameBTN.x = ((BACKGROUND_WIDTH - newGameBTN.width) * .5)+HUD_WIDTH;
+            newGameBTN.y = 40;
             newGameBTN.addEventListener(MouseEvent.MOUSE_UP, onNewGame);
 
             var creditsBTN:SimpleButton = addChild(new SimpleButton(new ContinueUp(), new ContinueOver(), new ContinueOver(), new ContinueUp())) as SimpleButton;
@@ -114,24 +114,24 @@ package com.gamecook.dungeonsanddice.activities
 
 
             // Layout credits button.
-            creditsBTN.x = (fullSizeWidth - creditsBTN.width) * .5;
+            creditsBTN.x = ((BACKGROUND_WIDTH - creditsBTN.width) * .5)+HUD_WIDTH
             creditsBTN.y = newGameBTN.y + newGameBTN.height + 4;
 
             var inventoryBTN:SimpleButton = addChild(new SimpleButton(new InventoryUp(), new InventoryOver(), new InventoryOver(), new InventoryUp())) as SimpleButton;
-            inventoryBTN.x = (fullSizeWidth - inventoryBTN.width) * .5;
+            inventoryBTN.x = ((BACKGROUND_WIDTH - inventoryBTN.width) * .5)+HUD_WIDTH
             inventoryBTN.y = creditsBTN.y + creditsBTN.height + 4;
             inventoryBTN.addEventListener(MouseEvent.MOUSE_UP, onInventory);
 
 
             soundBTN = addChild(new SimpleButton(new SoundOn(), null, null, new SoundOn())) as SimpleButton;
 
-            soundBTN.x = (fullSizeWidth - soundBTN.width) * .5;
+            soundBTN.x = ((BACKGROUND_WIDTH - soundBTN.width) * .5)+HUD_WIDTH
             soundBTN.y = inventoryBTN.y + inventoryBTN.height + 4;
             soundBTN.addEventListener(MouseEvent.MOUSE_UP, onSoundToggle);
             updateMuteButtonState();
 
             var homeSplash:Bitmap = addChild(Bitmap(new HomeSplashImage())) as Bitmap;
-            homeSplash.x = (fullSizeWidth - homeSplash.width) * .5;
+            homeSplash.x = ((BACKGROUND_WIDTH - homeSplash.width) * .5)+HUD_WIDTH
             homeSplash.y = fullSizeHeight - homeSplash.height - 15;
 
             startNextActivityTimer(CreditsActivity, 5);

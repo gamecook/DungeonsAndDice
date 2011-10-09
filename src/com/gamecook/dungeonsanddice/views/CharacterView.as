@@ -22,6 +22,7 @@
 
 package com.gamecook.dungeonsanddice.views
 {
+    import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
     import com.gamecook.frogue.combat.ICombatant;
     import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.equipment.IEquipable;
@@ -61,10 +62,10 @@ package com.gamecook.dungeonsanddice.views
             container = new Sprite();
 
             lifeBar = container.addChild(new LifeBarView(model.getLife(), model.getMaxLife())) as LifeBarView;
-            lifeBar.x = -2;
-            lifeBar.y = 2;
+            lifeBar.x = -4;
+            lifeBar.y = -10;
 
-            lifeBar.x += (64 - lifeBar.width);
+            lifeBar.x += (SpriteSheetFactory.TILE_SIZE - lifeBar.width);
             container.x -= 32;
             container.y -= 32;
 

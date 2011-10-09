@@ -10,6 +10,7 @@ package com.gamecook.dungeonsanddice.activities
     import com.flashartofwar.BitmapScroller;
     import com.flashartofwar.behaviors.EaseScrollBehavior;
     import com.flashartofwar.ui.Slider;
+    import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
     import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.sprites.SpriteSheet;
     import com.gamecook.frogue.tiles.TileTypes;
@@ -47,7 +48,6 @@ import flash.text.TextField;
         private var scrollerContainer:Sprite;
         private var instancesRects:Array = [];
         private var textFieldStamp:TextField;
-        public var tileSize:int = 64;
         private var bitmapData:BitmapData;
         private var offset:int = 55;
 
@@ -131,7 +131,7 @@ import flash.text.TextField;
             var leftMargin:int = 0;
             var rightMargin:int = 30;
 
-            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((tileSize + padding) * rows) + 10, true, 0);
+            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((SpriteSheetFactory.TILE_SIZE + padding) * rows) + 10, true, 0);
             var currentColumn:int = 0;
             var currentRow:int = 0;
             var foundColorMatrix:ColorTransform = new ColorTransform();
@@ -154,12 +154,12 @@ import flash.text.TextField;
                 spriteName = "M"+(i+1);
                 var matrix:Matrix = new Matrix();
 
-                newX = (currentColumn * (tileSize + padding + rightMargin) + leftMargin);
-                newY = (currentRow * (tileSize + padding)) + 5;
+                newX = (currentColumn * (SpriteSheetFactory.TILE_SIZE + padding + rightMargin) + leftMargin);
+                newY = (currentRow * (SpriteSheetFactory.TILE_SIZE + padding)) + 5;
 
                 matrix.translate(newX, newY);
 
-                instancesRects[spriteName] = new Rectangle(newX, newY, tileSize, tileSize);
+                instancesRects[spriteName] = new Rectangle(newX, newY, SpriteSheetFactory.TILE_SIZE, SpriteSheetFactory.TILE_SIZE);
 
                 // test if item is found
                 /*if (unlockedEquipment.indexOf(sprites[i]) == -1)
@@ -180,7 +180,7 @@ import flash.text.TextField;
 
                 textFieldStamp.htmlText = "Dungeon "+(i+1)+" unlocked\n<span class='grey'>Monster: "+TileTypes.getTileName(spriteName)+"s</span>";
 
-                matrix.translate(tileSize + 5, 0);
+                matrix.translate(SpriteSheetFactory.TILE_SIZE + 5, 0);
                 currentPage.draw(textFieldStamp, matrix, foundColorMatrix);
 
                 if (currentColumn == columns - 1)

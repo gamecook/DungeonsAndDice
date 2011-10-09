@@ -60,27 +60,27 @@ package com.gamecook.dungeonsanddice.activities
             activeState.increaseTotalLosses();
             // Add you lose bitmap.
             var youLose:Bitmap = addChild(Bitmap(new YouLoseImage())) as Bitmap;
-            youLose.x = (fullSizeWidth * .5) - (youLose.width * .5);
+            youLose.x = ((BACKGROUND_WIDTH - youLose.width) * .5) + HUD_WIDTH;
             youLose.y = logo.y + logo.height + 30;
 
             var character:Bitmap = addChild(data.characterImage) as Bitmap;
-            character.x = (fullSizeWidth - character.width) * .5;
+            character.x = ((BACKGROUND_WIDTH - character.width) * .5) + HUD_WIDTH;
             character.y = youLose.y + youLose.height + 15;
 
             bonusTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, formatBonusText(), 160)) as TextField;
-            bonusTF.x = (fullSizeWidth - bonusTF.width) * .5;
+            bonusTF.x = ((BACKGROUND_WIDTH - bonusTF.width) * .5) + HUD_WIDTH;
             bonusTF.y = character.y + character.height + 10;
 
             scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, "FINAL "+TextFieldFactory.SCORE_LABEL + TextFieldFactory.padScore(), 200)) as TextField;
             scoreTF.textColor = 0x33ff00;
-            scoreTF.x = (fullSizeWidth - scoreTF.width) * .5;
+            scoreTF.x = ((BACKGROUND_WIDTH - scoreTF.width) * .5) + HUD_WIDTH;
             scoreTF.y = bonusTF.y + bonusTF.height + 10;
 
             // Add event listener to activity for click.
             addEventListener(MouseEvent.CLICK, onClick);
 
             var continueLabel:Bitmap = addChild(Bitmap(new ContinueImage())) as Bitmap;
-            continueLabel.x = (fullSizeWidth - continueLabel.width) * .5;
+            continueLabel.x = ((BACKGROUND_WIDTH - continueLabel.width) * .5) + HUD_WIDTH;
             continueLabel.y = fullSizeHeight - (continueLabel.height + 10);
 
             var countUpEffect:CountUpTextEffect = new CountUpTextEffect(scoreTF);

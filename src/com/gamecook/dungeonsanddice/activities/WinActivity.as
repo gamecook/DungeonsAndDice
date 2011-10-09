@@ -73,7 +73,7 @@ package com.gamecook.dungeonsanddice.activities
 
             //TODO need to update player stats and save out state.
             var youWin:Bitmap = addChild(Bitmap(new YouWinImage())) as Bitmap;
-            youWin.x = (fullSizeWidth * .5) - (youWin.width * .5);
+            youWin.x = ((BACKGROUND_WIDTH - youWin.width) * .5) + HUD_WIDTH;
             youWin.y = logo.y + logo.height + 20;
 
             //TODO need to be able to show player or tresaure chest based on the difficulty level.
@@ -83,7 +83,7 @@ package com.gamecook.dungeonsanddice.activities
              character.y = youWin.y + youWin.height + 15;*/
 
             treasureChest = addChild(new PaperSprite()) as PaperSprite;
-            treasureChest.x = (fullSizeWidth - treasureChest.width) * .5;
+            treasureChest.x = ((BACKGROUND_WIDTH - treasureChest.width) * .5) + HUD_WIDTH;
             treasureChest.y = youWin.y + youWin.height + 50;
             treasureChest.front = new Bitmap(spriteSheet.getSprite(TileTypes.getTileSprite("T")));
 
@@ -111,16 +111,16 @@ package com.gamecook.dungeonsanddice.activities
             }
 
             treasureTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmallCenter, "You have discovered a treasure chest.", 200)) as TextField;
-            treasureTF.x = (fullSizeWidth - treasureTF.width) * .5;
+            treasureTF.x = ((BACKGROUND_WIDTH - treasureTF.width) * .5) + HUD_WIDTH;
             treasureTF.y = treasureChest.y + treasureChest.height - 20;
 
             bonusTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, formatBonusText(), 160)) as TextField;
-            bonusTF.x = (fullSizeWidth - bonusTF.width) * .5;
+            bonusTF.x = ((BACKGROUND_WIDTH - bonusTF.width) * .5) + HUD_WIDTH;
             bonusTF.y = treasureTF.y + treasureTF.height + 10;
 
             scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, "SCORE\n<span class='green'>" +TextFieldFactory.padScore(), 160)) as TextField;
             //scoreTF.textColor = 0x33ff00;
-            scoreTF.x = (fullSizeWidth - scoreTF.width) * .5;
+            scoreTF.x = ((BACKGROUND_WIDTH - scoreTF.width) * .5) + HUD_WIDTH;
             scoreTF.y = bonusTF.y + bonusTF.height + 10;
 
             activeState.score = generateNewScore();
@@ -130,7 +130,7 @@ package com.gamecook.dungeonsanddice.activities
 
             continueLabel = addChild(Bitmap(new ContinueImage())) as Bitmap;
             continueLabel.visible;
-            continueLabel.x = (fullSizeWidth - continueLabel.width) * .5;
+            continueLabel.x = ((BACKGROUND_WIDTH - continueLabel.width) * .5) + HUD_WIDTH;
             continueLabel.y = fullSizeHeight - (continueLabel.height + 10);
 
             countUpEffect = new CountUpTextEffect(scoreTF, null, onCountUpComplete);

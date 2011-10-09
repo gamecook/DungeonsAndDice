@@ -19,7 +19,7 @@ package com.gamecook.dungeonsanddice.factories
         [Embed(source="../../../../../build/assets/tc_sprite_sheet.png")]
         public static var SpriteSheetImage:Class;
 
-        private static const TILE_SIZE:int = 64;
+        public static const TILE_SIZE:int = 32;
 
         public static function parseSpriteSheet(spriteSheet:SpriteSheet):void
         {

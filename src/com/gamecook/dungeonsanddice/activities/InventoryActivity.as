@@ -10,6 +10,7 @@ package com.gamecook.dungeonsanddice.activities
     import com.flashartofwar.BitmapScroller;
     import com.flashartofwar.behaviors.EaseScrollBehavior;
     import com.flashartofwar.ui.Slider;
+    import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
     import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.sprites.SpriteSheet;
     import com.gamecook.frogue.tiles.TileTypes;
@@ -46,7 +47,6 @@ package com.gamecook.dungeonsanddice.activities
         private var scrollerContainer:Sprite;
         private var instancesRects:Array = [];
         private var textFieldStamp:TextField;
-        public var tileSize:int = 64;
         private var bitmapData:BitmapData;
         private var coinContainer:Bitmap;
         private var offset:int = 55;
@@ -209,8 +209,8 @@ package com.gamecook.dungeonsanddice.activities
                     //stamp = new BitmapData(textFieldStamp.width, textFieldStamp.height);
                     //stamp.draw(text)
                     matrix.rotate(Math.PI * 2 * (-90 / 360));
-                    matrix.translate(Math.round(rect.y + rect.height), Math.round((bitmapData.height - rect.x) - ((tileSize - textFieldStamp.width) * .5)));
-                    //matrix.translate(Math.round(,tileSize - bitmapData.  );
+                    matrix.translate(Math.round(rect.y + rect.height), Math.round((bitmapData.height - rect.x) - ((SpriteSheetFactory.TILE_SIZE - textFieldStamp.width) * .5)));
+                    //matrix.translate(Math.round(,SpriteSheetFactory.TILE_SIZE - bitmapData.  );
                     //bitmapData.draw(textFieldStamp, matrix, null, null, null, true);
                     //bitmapScroller.invalidate(BitmapScroller.INVALID_VISUALS);
 
@@ -269,7 +269,7 @@ package com.gamecook.dungeonsanddice.activities
             var leftMargin:int = 0;
             var rightMargin:int = 30;
 
-            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((tileSize + padding) * rows) + 10, true, 0);
+            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((SpriteSheetFactory.TILE_SIZE + padding) * rows) + 10, true, 0);
             var currentColumn:int = 0;
             var currentRow:int = 0;
             var foundColorMatrix:ColorTransform = new ColorTransform();
@@ -286,12 +286,12 @@ package com.gamecook.dungeonsanddice.activities
 
                 var matrix:Matrix = new Matrix();
 
-                newX = (currentColumn * (tileSize + padding + rightMargin) + leftMargin);
-                newY = (currentRow * (tileSize + padding)) + 5;
+                newX = (currentColumn * (SpriteSheetFactory.TILE_SIZE + padding + rightMargin) + leftMargin);
+                newY = (currentRow * (SpriteSheetFactory.TILE_SIZE + padding)) + 5;
 
                 matrix.translate(newX, newY);
 
-                instancesRects[sprites[i]] = new Rectangle(newX, newY, tileSize, tileSize);
+                instancesRects[sprites[i]] = new Rectangle(newX, newY, SpriteSheetFactory.TILE_SIZE, SpriteSheetFactory.TILE_SIZE);
 
                 // test if item is found
                 if (unlockedEquipment.indexOf(sprites[i]) == -1)
@@ -311,7 +311,7 @@ package com.gamecook.dungeonsanddice.activities
                 currentPage.draw(spriteSheet.getSprite(TileTypes.getEquipmentPreview(sprites[i])), matrix, foundColorMatrix);
 
                 textFieldStamp.text = TileTypes.getTileName(sprites[i]);
-                matrix.translate(Math.round((tileSize - textFieldStamp.width) * .5), tileSize);
+                matrix.translate(Math.round((SpriteSheetFactory.TILE_SIZE - textFieldStamp.width) * .5), SpriteSheetFactory.TILE_SIZE);
                 currentPage.draw(textFieldStamp, matrix, foundColorMatrix);
 
                 if (currentColumn == columns - 1)

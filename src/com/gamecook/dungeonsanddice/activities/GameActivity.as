@@ -88,7 +88,6 @@ package com.gamecook.dungeonsanddice.activities
         private var activeTiles:Array = [];
         private var maxActiveTiles:int = 1;
         private var tileContainer:Sprite;
-        private var tileInstances:Array = [];
         private var player:CharacterView;
         private var monster:CharacterView;
         private var difficulty:int;
@@ -99,7 +98,6 @@ package com.gamecook.dungeonsanddice.activities
         private var bonusLabel:TextField;
         private var gameBackground:Bitmap;
         private var highlightInstances:Array = [];
-        private var spriteSheet:SpriteSheet = SingletonManager.getClassReference(SpriteSheet);
         private var debug:Boolean = false;
         private var monsterCounter:int = 0;
         private var monsterAttackDelay:int = 15000;
@@ -111,6 +109,7 @@ package com.gamecook.dungeonsanddice.activities
         private var monsterDiceContainer:Sprite;
         private var round:int = 0;
         private var maxRounds:int = 2;
+        private var characterGroup:Sprite;
 
         public function GameActivity(activityManager:IActivityManager, data:*)
         {
@@ -137,40 +136,23 @@ package com.gamecook.dungeonsanddice.activities
             createDiceSpriteSheet();
 
             var menuBar:MenuBar = addChild(new MenuBar(MenuBar.EXIT_ONLY_MODE, logo.width, this)) as MenuBar;
-            menuBar.x = logo.x;
-            menuBar.y = logo.y + logo.height - 2;
+            /*menuBar.x = logo.x;
+            menuBar.y = logo.y + logo.height - 2;*/
 
             activeState.initialScore = activeState.score;
 
-            //var hand1 : Array = makeRandomHand();
-            //trace("First Hand", hand1);
-
-
-
-            /*var types : Array = new Array("High Card", "One Pair", "Two Pair", "Three of a Kind", "Full House", "Straight", "Four of a Kind", "Five of a Kind");
-			for (var run : Number = 0;run < 5; run++) {
-				trace("Test " + run);
-				var hand1 : Array = makeRandomHand();
-				var hand2 : Array = makeRandomHand();
-				var rank1 : Object = DicePokerValidationUtil.rankHand(hand1);
-				var rank2 : Object = DicePokerValidationUtil.rankHand(hand2);
-				trace("Hand 1: " + hand1 + " has value: " + rank1.rank + ", and is a " + types[rank1.type]);
-				trace("Hand 2: " + hand2 + " has value: " + rank2.rank + ", and is a " + types[rank2.type]);
-
-				var winner : Number = DicePokerValidationUtil.compareHands(hand1, hand2);
-				trace("Winner is hand" + winner);
-			}*/
-
-            gameBackground = addChild(Bitmap(new GameBoardImage())) as Bitmap;
-            gameBackground.x = (fullSizeWidth * .5) - (gameBackground.width * .5);
-            gameBackground.y = fullSizeHeight - gameBackground.height;
-
-
             tileContainer = addChild(new Sprite()) as Sprite;
-            tileContainer.x = gameBackground.x + 55;
-            tileContainer.y = gameBackground.y + 50;
+            tileContainer.x = HUD_WIDTH;
+            tileContainer.y = 33;
+
+            gameBackground = tileContainer.addChild(Bitmap(new GameBoardImage())) as Bitmap;
 
             var total:int = 10;
+
+
+            characterGroup = tileContainer.addChild(new Sprite()) as Sprite;
+
+
             /*var i:int;
             var tile:PaperSprite;
 
@@ -196,24 +178,7 @@ package com.gamecook.dungeonsanddice.activities
             statusBar.x = (fullSizeWidth - statusBar.width) * .5;
             statusBar.y = menuBar.y + 8;
             var spriteName:String;
-            /*
-            //TODO need to inject player and monster into this array
-            for (i = 0; i < total; i++)
-            {
-                if (i % typeCount == 0)
-                    typeIndex ++;
 
-                spriteName = TileTypes.getEquipmentPreview(sprites[typeIndex]) ? TileTypes.getEquipmentPreview(sprites[typeIndex]) : TileTypes.getTileSprite(sprites[typeIndex]);
-                tileBitmap = new Bitmap(spriteSheet.getSprite(spriteName));
-                tile = tileContainer.addChild(createTile(tileBitmap)) as PaperSprite;
-                tileInstances.push(tile);
-                tile.name = sprites[typeIndex];
-
-                if (debug)
-                    tile.flip();
-
-            }
-            */
             activeState.levelTurns = 0;
 
             createPlayer(total);
@@ -221,9 +186,8 @@ package com.gamecook.dungeonsanddice.activities
             var monsterModel:MonsterTile = new MonsterTile();
             monsterModel.parseObject({name:"monster", maxLife: total / 2});
 
-            monster = tileContainer.addChild(new CharacterView(monsterModel)) as CharacterView;
-            monster.x = 65;
-            monster.y = 73;
+            monster = characterGroup.addChild(new CharacterView(monsterModel)) as CharacterView;
+            monster.x = player.width + 12;
             monster.generateRandomEquipment();
 
             attackWarningLabel = monster.addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, "", 20)) as TextField;
@@ -246,13 +210,7 @@ package com.gamecook.dungeonsanddice.activities
                 textEffect = new TypeTextEffect(statusBar.message, onTextEffectUpdate);
             }
             createBonusLabel();
-               /*
-            createHighlights();
 
-            layoutTiles();
-
-            enableLogo();
-            */
             updateStatusBar();
 
             // Update status message
@@ -277,7 +235,10 @@ package com.gamecook.dungeonsanddice.activities
 
             addChild(menuBar);
 
-            player.addEventListener(MouseEvent.CLICK, onClick);
+            tileContainer.addEventListener(MouseEvent.CLICK, onClick);
+
+            characterGroup.x = ((tileContainer.width - characterGroup.width) * .5);
+            characterGroup.y = (tileContainer.height - characterGroup.height) * .5;
 
         }
 
@@ -301,16 +262,17 @@ package com.gamecook.dungeonsanddice.activities
         {
             playerDiceContainer = addChild(new Sprite()) as Sprite;
             createDiceGroup(playerDiceContainer, playerDiceInstances);
-            playerDiceContainer.x = 40;
-            playerDiceContainer.y =320;
+            playerDiceContainer.x = ((BACKGROUND_WIDTH - playerDiceContainer.width) * .5) + HUD_WIDTH;
+            playerDiceContainer.y =fullSizeHeight - playerDiceContainer.height - 2;
         }
 
         private function createMonsterDice():void
         {
             monsterDiceContainer = addChild(new Sprite()) as Sprite;
             createDiceGroup(monsterDiceContainer, monsterDiceInstances);
-            monsterDiceContainer.x = 40;
-            monsterDiceContainer.y = 135;
+            monsterDiceContainer.scaleX = monsterDiceContainer.scaleY = .5;
+            monsterDiceContainer.x = HUD_WIDTH + 42;
+            monsterDiceContainer.y = 13;
         }
 
         private function createDiceGroup(container:Sprite, instanceCollection:Array):void
@@ -346,8 +308,6 @@ package com.gamecook.dungeonsanddice.activities
         {
             var maxLife:int = (total / difficulty) + 5;
 
-            trace("maxLife", maxLife);
-
             var playerModel:MonsterTile = new MonsterTile();
 
             playerModel.parseObject({name:"player", maxLife: maxLife, life:activeState.playerLife > 0 ? activeState.playerLife : maxLife});
@@ -369,22 +329,7 @@ package com.gamecook.dungeonsanddice.activities
             if (activeState.equippedInventory[SlotsEnum.WEAPON])
                 sprites.push(TileTypes.getTileSprite(activeState.equippedInventory[SlotsEnum.WEAPON]));
 
-            player = tileContainer.addChild(new CharacterView(playerModel, sprites)) as CharacterView;
-            player.x = 65;
-            player.y = 135;
-        }
-
-        private function createHighlights():void
-        {
-            var i:int;
-            var tmpHighlight:Bitmap;
-            var total:int = maxActiveTiles + 1;
-            for (i = 0; i < total; i++)
-            {
-                tmpHighlight = tileContainer.addChild(new TileHighlightImage()) as Bitmap;
-                tmpHighlight.visible = false;
-                highlightInstances.push(tmpHighlight);
-            }
+            player = characterGroup.addChild(new CharacterView(playerModel, sprites)) as CharacterView;
         }
 
         private function createBonusLabel():void
@@ -416,69 +361,6 @@ package com.gamecook.dungeonsanddice.activities
             statusBar.setScore(activeState.score);
             statusBar.setLevel(activeState.playerLevel, "<span class='lightGray'>-"+DifficultyLevels.getLabel(difficulty).substr(0,1).toUpperCase())+"</span>";
             statusBar.setTurns(activeState.levelTurns);
-        }
-
-        /**
-         *
-         * Goes through the tileInstance array and lays them out in a grid.
-         *
-         */
-        private function layoutTiles():void
-        {
-            tileInstances = ArrayUtil.shuffleArray(tileInstances);
-
-            tileInstances.splice(4, 0, player);
-            tileInstances.splice(7, 0, monster);
-
-            var total:int = tileInstances.length;
-            var columns:int = 3;
-            var i:int;
-            var nextX:int = 0;
-            var nextY:int = 0;
-            var tile:DisplayObject;
-
-            for (i = 0; i < total; i++)
-            {
-                tile = tileInstances[i];
-                tile.x = nextX;
-                tile.y = nextY;
-
-                nextX += 64;
-                if (nextX % columns == 0)
-                {
-                    nextX = 0;
-                    nextY += 64;
-                }
-
-            }
-        }
-
-        /**
-         *
-         * Creates a new tile with a bitmap on it's back.
-         *
-         * @param tile - BitmapImage to use for back of tile.
-         * @return Instance of the created PaperSprite tile.
-         *
-         */
-        private function createTile(tile:Bitmap):PaperSprite
-        {
-            // Create Sprite for front
-            var front:Sprite = new Sprite();
-            front.graphics.beginFill(0x000000, .5);
-            front.graphics.drawRect(0, 0, 64, 64);
-            front.graphics.endFill();
-
-            // Create TwoSidedPlane
-            var tempPlane:PaperSprite = new PaperSprite(front, tile);
-
-            // Make PaperSprite act as a button
-            tempPlane.addEventListener(MouseEvent.CLICK, onClick);
-            tempPlane.mouseChildren = false;
-            tempPlane.buttonMode = true;
-            tempPlane.useHandCursor = true;
-
-            return tempPlane;
         }
 
         /**

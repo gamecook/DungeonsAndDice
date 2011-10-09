@@ -48,7 +48,7 @@ package com.gamecook.dungeonsanddice.factories
         public static const textFormatSmall:TextFormat = new TextFormat("system", 8, 0xffffff, null, null, null, null, null, "left");
         public static const textFormatSmallCenter:TextFormat = new TextFormat("system", 8, 0xffffff, null, null, null, null, null, "center");
 
-        private static var css:XML = <css><![CDATA[
+        public static var css:XML = <css><![CDATA[
                                     .orange
                                     {
                                         color:#ff9900;

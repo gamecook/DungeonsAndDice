@@ -65,9 +65,10 @@ package com.gamecook.dungeonsanddice.activities
             img.x = (fullSizeWidth * .5) - (img.width * .5);
             img.y = (fullSizeHeight * .5) - (img.height * .5);
 
-
+            //TODO For debug set to activity you want to test and comment out StartActivity.
             // Go to the main activity after 3 seconds
-            startNextActivityTimer(StartActivity, 3);
+            //startNextActivityTimer(StartActivity, 3);
+            startNextActivityTimer(DungeonActivity, 0);
         }
     }
 }

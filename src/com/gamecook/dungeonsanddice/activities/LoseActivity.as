@@ -61,7 +61,7 @@ package com.gamecook.dungeonsanddice.activities
             // Add you lose bitmap.
             var youLose:Bitmap = addChild(Bitmap(new YouLoseImage())) as Bitmap;
             youLose.x = ((BACKGROUND_WIDTH - youLose.width) * .5) + HUD_WIDTH;
-            youLose.y = logo.y + logo.height + 30;
+            youLose.y = 0;
 
             var character:Bitmap = addChild(data.characterImage) as Bitmap;
             character.x = ((BACKGROUND_WIDTH - character.width) * .5) + HUD_WIDTH;

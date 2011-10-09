@@ -74,13 +74,7 @@ package com.gamecook.dungeonsanddice.activities
             //TODO need to update player stats and save out state.
             var youWin:Bitmap = addChild(Bitmap(new YouWinImage())) as Bitmap;
             youWin.x = ((BACKGROUND_WIDTH - youWin.width) * .5) + HUD_WIDTH;
-            youWin.y = logo.y + logo.height + 20;
-
-            //TODO need to be able to show player or tresaure chest based on the difficulty level.
-
-            /*var character:Bitmap = addChild(data.characterImage) as Bitmap;
-             character.x = (fullSizeWidth - character.width) * .5;
-             character.y = youWin.y + youWin.height + 15;*/
+            youWin.y = 0;
 
             treasureChest = addChild(new PaperSprite()) as PaperSprite;
             treasureChest.x = ((BACKGROUND_WIDTH - treasureChest.width) * .5) + HUD_WIDTH;

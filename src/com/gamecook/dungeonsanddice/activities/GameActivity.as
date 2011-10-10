@@ -125,8 +125,16 @@ package com.gamecook.dungeonsanddice.activities
 
             super.onCreate();
 
+            displayContextualButton("EXIT");
+
             // Set the difficulty level from the active state object
             difficulty = activeState.difficulty;
+        }
+
+
+        override protected function onContextualButtonClick(event:MouseEvent):void
+        {
+            nextActivity(StartActivity);
         }
 
         override public function onStart():void

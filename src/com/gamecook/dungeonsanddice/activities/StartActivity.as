@@ -79,6 +79,8 @@ package com.gamecook.dungeonsanddice.activities
 
             super.onCreate();
 
+            displayContextualButton("QUIT");
+
             soundManager.mute = activeState.mute;
         }
 
@@ -137,6 +139,11 @@ package com.gamecook.dungeonsanddice.activities
             startNextActivityTimer(CreditsActivity, 5);
 
             addEventListener(MouseEvent.CLICK, onClick)
+        }
+
+        override protected function onContextualButtonClick(event:MouseEvent):void
+        {
+            trace("Need to quit application here.");
         }
 
         private function onInventory(event:MouseEvent):void

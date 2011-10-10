@@ -101,14 +101,19 @@ import flash.text.TextField;
             scrollerContainer.x = fullSizeHeight + (HUD_WIDTH - (HUD_PADDING + 10));
             scrollerContainer.y = offset;
 
-            addEventListener(MouseEvent.CLICK, onClick);
+            scrollerContainer.addEventListener(MouseEvent.CLICK, onClick);
 
         }
 
         override public function onStart():void
         {
             super.onStart();
-            displayContextualButton();
+            displayContextualButton("BACK");
+        }
+
+        override protected function onContextualButtonClick(event:MouseEvent):void
+        {
+            activityManager.back();
         }
 
         private function onClick(event:MouseEvent):void

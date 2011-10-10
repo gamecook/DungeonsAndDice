@@ -56,13 +56,18 @@ package com.gamecook.dungeonsanddice.activities
             sponsors.y = HUD_MESSAGE_Y + 5;
 
             // Enable the logo to go back
-            displayContextualButton();
+            displayContextualButton("BACK");
 
             // create a time delay to show the StartActivity
             startNextActivityTimer(StartActivity, 10);
 
             // Add click handler to skip the timer and go to start
             addEventListener(MouseEvent.CLICK, onClick)
+        }
+
+        override protected function onContextualButtonClick(event:MouseEvent):void
+        {
+            activityManager.back();
         }
 
         private function onClick(event:MouseEvent):void

@@ -117,7 +117,12 @@ package com.gamecook.dungeonsanddice.activities
         override public function onStart():void
         {
             super.onStart();
-            displayContextualButton();
+            displayContextualButton("BACK");
+        }
+
+        override protected function onContextualButtonClick(event:MouseEvent):void
+        {
+            activityManager.back();
         }
 
         private function formatStatsText():String
@@ -166,7 +171,7 @@ package com.gamecook.dungeonsanddice.activities
             for (i = 0; i < 3; i++)
             {
                 var matrix:Matrix = new Matrix();
-                matrix.scale(.5, .5)
+                //matrix.scale(.5, .5)
                 matrix.translate(40 * i, 12);
                 coinContainer.bitmapData.draw(spriteSheet.getSprite(TileTypes.getTileSprite(sprites[i])), matrix);
 
@@ -257,7 +262,7 @@ package com.gamecook.dungeonsanddice.activities
         private function generateBitmapSheets():BitmapData
         {
             var sprites:Array = SpriteFactory.equipment.slice();
-
+            var tileSize:int = SpriteSheetFactory.TILE_SIZE * 2;
             var i:int = 0;
             var total:int = sprites.length;
             var padding:int = 20;
@@ -269,7 +274,7 @@ package com.gamecook.dungeonsanddice.activities
             var leftMargin:int = 0;
             var rightMargin:int = 30;
 
-            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((SpriteSheetFactory.TILE_SIZE + padding) * rows) + 10, true, 0);
+            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((tileSize + padding) * rows) + 10, true, 0);
             var currentColumn:int = 0;
             var currentRow:int = 0;
             var foundColorMatrix:ColorTransform = new ColorTransform();
@@ -286,12 +291,14 @@ package com.gamecook.dungeonsanddice.activities
 
                 var matrix:Matrix = new Matrix();
 
-                newX = (currentColumn * (SpriteSheetFactory.TILE_SIZE + padding + rightMargin) + leftMargin);
-                newY = (currentRow * (SpriteSheetFactory.TILE_SIZE + padding)) + 5;
+                newX = (currentColumn * (tileSize + padding + rightMargin) + leftMargin);
+                newY = (currentRow * (tileSize + padding)) + 5;
 
                 matrix.translate(newX, newY);
+                matrix.a = 2;
+                matrix.d = 2;
 
-                instancesRects[sprites[i]] = new Rectangle(newX, newY, SpriteSheetFactory.TILE_SIZE, SpriteSheetFactory.TILE_SIZE);
+                instancesRects[sprites[i]] = new Rectangle(newX, newY, tileSize, tileSize);
 
                 // test if item is found
                 if (unlockedEquipment.indexOf(sprites[i]) == -1)
@@ -311,7 +318,9 @@ package com.gamecook.dungeonsanddice.activities
                 currentPage.draw(spriteSheet.getSprite(TileTypes.getEquipmentPreview(sprites[i])), matrix, foundColorMatrix);
 
                 textFieldStamp.text = TileTypes.getTileName(sprites[i]);
-                matrix.translate(Math.round((SpriteSheetFactory.TILE_SIZE - textFieldStamp.width) * .5), SpriteSheetFactory.TILE_SIZE);
+                matrix.translate(Math.round((tileSize - textFieldStamp.width) * .5), tileSize);
+                matrix.a = 1;
+                matrix.d = 1;
                 currentPage.draw(textFieldStamp, matrix, foundColorMatrix);
 
                 if (currentColumn == columns - 1)

@@ -22,13 +22,16 @@
 
 package com.gamecook.dungeonsanddice.activities
 {
+    import com.gamecook.dungeonsanddice.factories.TextFieldFactory;
     import com.gamecook.dungeonsanddice.states.ActiveGameState;
     import com.jessefreeman.factivity.activities.BaseActivity;
     import com.jessefreeman.factivity.activities.IActivityManager;
 
     import flash.display.Bitmap;
+    import flash.display.SimpleButton;
     import flash.display.Sprite;
     import flash.events.MouseEvent;
+    import flash.text.TextField;
 
     /**
      *
@@ -52,6 +55,7 @@ package com.gamecook.dungeonsanddice.activities
         protected var logo:Bitmap;
         protected var logoContainer:Sprite;
         protected var activeState:ActiveGameState;
+        private var contextualButton:TextField;
 
         public function LogoActivity(activityManager:IActivityManager, data:*)
         {
@@ -70,7 +74,14 @@ package com.gamecook.dungeonsanddice.activities
             activeState = new ActiveGameState();
             activeState.load();
 
+
+
             super.onCreate();
+        }
+
+        protected function onContextualButtonClick(event:MouseEvent):void
+        {
+            trace("Click Contextual Button");
         }
 
         override public function onStart():void
@@ -94,11 +105,12 @@ package com.gamecook.dungeonsanddice.activities
          * Call this to turn the Logo into a Back Button.
          *
          */
-        protected function displayContextualButton():void
+        protected function displayContextualButton(label:String):void
         {
-            logoContainer.useHandCursor = true;
-            logoContainer.buttonMode = true;
-            logoContainer.addEventListener(MouseEvent.CLICK, onHome);
+            contextualButton = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLarge, label, 60)) as TextField;
+            contextualButton.x = fullSizeWidth - contextualButton.width;
+            contextualButton.y = 5;
+            contextualButton.addEventListener(MouseEvent.CLICK, onContextualButtonClick);
         }
 
         /**

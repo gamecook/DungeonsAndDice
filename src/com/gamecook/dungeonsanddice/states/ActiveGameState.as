@@ -177,6 +177,7 @@ package com.gamecook.dungeonsanddice.states
             _dataObject.turns = 0;
             _dataObject.playerLevel = 0;
             _dataObject.activeGame = false;
+            _dataObject.totalKills = 0;
         }
 
         public function get equippedInventory():Array
@@ -240,6 +241,25 @@ package com.gamecook.dungeonsanddice.states
         public function get initialScore():int
         {
             return _dataObject.initialScore;
+        }
+
+        public function get totalKills():int
+        {
+            return _dataObject.totalKills;
+        }
+
+        public function increaseTotalKills():String
+        {
+            if (!_dataObject.totalKills)
+                _dataObject.totalTurns = 0;
+            return _dataObject.totalKills ++;
+        }
+
+        public function get unlockPercentage():int {
+
+            return 0;
+            //TODOD this need
+            //return Math.round(unlocked / total * 100);
         }
     }
 }

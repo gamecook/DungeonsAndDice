@@ -143,7 +143,7 @@ package com.gamecook.dungeonsanddice.activities
 
             createDiceSpriteSheet();
 
-            var menuBar:MenuBar = addChild(new MenuBar(MenuBar.EXIT_ONLY_MODE, logo.width, this)) as MenuBar;
+            //var menuBar:MenuBar = addChild(new MenuBar(MenuBar.EXIT_ONLY_MODE, logo.width, this)) as MenuBar;
             /*menuBar.x = logo.x;
             menuBar.y = logo.y + logo.height - 2;*/
 
@@ -183,9 +183,8 @@ package com.gamecook.dungeonsanddice.activities
             var tileBitmap:Bitmap;
             */
             statusBar = addChild(new StatusBarView()) as StatusBarView;
-            statusBar.x = (fullSizeWidth - statusBar.width) * .5;
-            statusBar.y = menuBar.y + 8;
-            var spriteName:String;
+            statusBar.x = HUD_PADDING;
+            statusBar.y = 50;
 
             activeState.levelTurns = 0;
 
@@ -241,7 +240,7 @@ package com.gamecook.dungeonsanddice.activities
             createPlayerDice();
             createMonsterDice();
 
-            addChild(menuBar);
+            //addChild(menuBar);
 
             tileContainer.addEventListener(MouseEvent.CLICK, onClick);
 
@@ -366,9 +365,9 @@ package com.gamecook.dungeonsanddice.activities
 
         private function updateStatusBar():void
         {
-            statusBar.setScore(activeState.score);
-            statusBar.setLevel(activeState.playerLevel, "<span class='lightGray'>-"+DifficultyLevels.getLabel(difficulty).substr(0,1).toUpperCase())+"</span>";
-            statusBar.setTurns(activeState.levelTurns);
+            statusBar.updateStats(activeState.score, activeState.totalKills, activeState.unlockPercentage);
+            //statusBar.setLevel(activeState.playerLevel, "<span class='lightGray'>-"+DifficultyLevels.getLabel(difficulty).substr(0,1).toUpperCase())+"</span>";
+            //statusBar.setTurns(activeState.levelTurns);
         }
 
         /**

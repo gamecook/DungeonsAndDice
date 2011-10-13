@@ -37,9 +37,9 @@ package com.gamecook.dungeonsanddice.factories
 
     public class TextFieldFactory
     {
-        public static const SCORE_LABEL:String = "<span class='grey'>SCORE</span>\n";
-        public static const LEVEL_LABEL:String = "<span class='grey'>LEVEL</span>\n";
-        public static const TURNS_LABEL:String = "<span class='grey'>TURNS</span>\n";
+        public static const SCORE_LABEL:String = "<span class='grey'>Score</span>";
+        public static const KILL_LABEL:String = "<span class='grey'>Kills</span>";
+        public static const INVENTORY_LABEL:String = "<span class='grey'>Inventory - (@percent@% discovered)</span>";
         private static const DEFAULT_SCORE_PADDING:String = "000000";
         private static const DEFAULT_LEVEL_PADDING:String = "00";
 

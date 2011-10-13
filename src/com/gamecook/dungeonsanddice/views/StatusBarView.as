@@ -40,7 +40,7 @@ package com.gamecook.dungeonsanddice.views
         private static var EMBEDDED_FONT:String;
         private var scoreTF:TextField;
         private var levelTF:TextField;
-        private var turnsTF:TextField;
+        //private var turnsTF:TextField;
 
         private var _message:TextField;
 
@@ -51,34 +51,33 @@ package com.gamecook.dungeonsanddice.views
 
         private function createDisplays():void
         {
-            scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, TextFieldFactory.TURNS_LABEL + TextFieldFactory.padScore())) as TextField;
+            scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, TextFieldFactory.INVENTORY_LABEL + TextFieldFactory.padScore(), 150)) as TextField;
 
-            levelTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, TextFieldFactory.LEVEL_LABEL + TextFieldFactory.padLevel())) as TextField;
-            levelTF.x = scoreTF.x + scoreTF.width;
+            /*levelTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, TextFieldFactory.KILL_LABEL + TextFieldFactory.padLevel())) as TextField;
+            levelTF.x = scoreTF.x + scoreTF.width;*/
 
-            turnsTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel())) as TextField;
-            turnsTF.x = levelTF.x + levelTF.width;
+           /* turnsTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel())) as TextField;
+            turnsTF.x = levelTF.x + levelTF.width;*/
 
-            _message = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "", turnsTF.x + turnsTF.width)) as TextField;
-            _message.y = scoreTF.height-5;
+            _message = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "", 150)) as TextField;
+            _message.y = 140;
             clear();
         }
 
-
-        public function setScore(value:int):void
+        public function updateStats(score:int, kills:int, inventory:int):void
         {
-            scoreTF.htmlText = TextFieldFactory.SCORE_LABEL + TextFieldFactory.padScore(value.toString());
+            scoreTF.htmlText = TextFieldFactory.SCORE_LABEL + " " + TextFieldFactory.padScore(score.toString()) +"  "+ TextFieldFactory.KILL_LABEL + " "+ TextFieldFactory.padScore(kills.toString()) + "\n"+ TextFieldFactory.INVENTORY_LABEL.replace("@percent@",inventory.toString() );
         }
 
-        public function setLevel(value:int, optional:String = ""):void
+        public function setLevel(value:int):void
         {
-            levelTF.htmlText = TextFieldFactory.LEVEL_LABEL + TextFieldFactory.padLevel(value.toString())+optional;
+            //levelTF.htmlText = ;
         }
 
-        public function setTurns(value:int):void
+       /* public function setTurns(value:int):void
         {
-            turnsTF.htmlText = TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel(value.toString());
-        }
+            //turnsTF.htmlText = TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel(value.toString());
+        }*/
 
         public function setMessage(value:String):void
         {
@@ -87,9 +86,9 @@ package com.gamecook.dungeonsanddice.views
 
         public function clear():void
         {
-            scoreTF.htmlText = TextFieldFactory.SCORE_LABEL + TextFieldFactory.padScore();
-            levelTF.htmlText = TextFieldFactory.LEVEL_LABEL + TextFieldFactory.padLevel();
-            turnsTF.htmlText = TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel();
+            scoreTF.htmlText = TextFieldFactory.SCORE_LABEL + " " +TextFieldFactory.padScore() + "  " +TextFieldFactory.KILL_LABEL + TextFieldFactory.padLevel();
+            //levelTF.htmlText = ;
+            //turnsTF.htmlText = TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel();
             _message.htmlText = "";
         }
 

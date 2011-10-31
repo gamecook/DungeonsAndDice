@@ -57,9 +57,6 @@ package com.gamecook.dungeonsanddice.activities
         [Embed(source="../../../../../build/assets/buttons/hard_over.png")]
         private var HardOver:Class;
 
-        [Embed(source="../../../../../build/assets/difficulty_levels.png")]
-        private var DifficultyImage:Class;
-
         public function NewGameActivity(activityManager:IActivityManager, data:*)
         {
             super(activityManager, data);
@@ -71,33 +68,28 @@ package com.gamecook.dungeonsanddice.activities
             super.onStart();
 
             var newGameLabel:Bitmap = addChild(new NewGame()) as Bitmap;
-            newGameLabel.x = (fullSizeWidth - newGameLabel.width) * .5;
+            newGameLabel.x = ((BACKGROUND_WIDTH - newGameLabel.width) * .5) + HUD_WIDTH;
             newGameLabel.y = logo.y + logo.height + 20;
 
             // Adding and setting up difficulty level buttons.
 
             var easyButton:SimpleButton = addChild(new SimpleButton(new EasyUp(), new EasyOver(), new EasyOver(), new EasyUp())) as SimpleButton;
             easyButton.name = DifficultyLevels.EASY;
-            easyButton.x = (fullSizeWidth - easyButton.width) * .5;
+            easyButton.x = ((BACKGROUND_WIDTH - easyButton.width) * .5)+ HUD_WIDTH;
             easyButton.y = newGameLabel.y + newGameLabel.height + 20;
             easyButton.addEventListener(MouseEvent.MOUSE_UP, onNewGame);
 
             var mediumButton:SimpleButton = addChild(new SimpleButton(new MediumUp(), new MediumOver(), new MediumOver(), new MediumUp())) as SimpleButton;
             mediumButton.name = DifficultyLevels.MEDIUM;
-            mediumButton.x = (fullSizeWidth - mediumButton.width) * .5;
+            mediumButton.x = ((BACKGROUND_WIDTH - mediumButton.width) * .5)+ HUD_WIDTH;
             mediumButton.y = easyButton.y + easyButton.height + 5;
             mediumButton.addEventListener(MouseEvent.MOUSE_UP, onNewGame);
 
             var hardButton:SimpleButton = addChild(new SimpleButton(new HardUp(), new HardOver(), new HardOver(), new HardUp())) as SimpleButton;
             hardButton.name = DifficultyLevels.HARD;
-            hardButton.x = (fullSizeWidth - hardButton.width) * .5;
+            hardButton.x = ((BACKGROUND_WIDTH - hardButton.width) * .5)+ HUD_WIDTH;
             hardButton.y = mediumButton.y + mediumButton.height + 5;
             hardButton.addEventListener(MouseEvent.MOUSE_UP, onNewGame);
-
-            // Sets up teh difficulty description image
-            var difficultyImage:Bitmap = addChild(new DifficultyImage()) as Bitmap;
-            difficultyImage.x = (fullSizeWidth - difficultyImage.width) * .5;
-            difficultyImage.y = hardButton.y + hardButton.height + 30;
 
             displayContextualButton("BACK");
         }

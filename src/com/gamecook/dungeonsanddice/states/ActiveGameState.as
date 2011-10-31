@@ -261,5 +261,25 @@ package com.gamecook.dungeonsanddice.states
             //TODOD this need
             //return Math.round(unlocked / total * 100);
         }
+
+        public function get playerName():String
+        {
+            return _dataObject.playerName;
+        }
+
+        public function set playerName(value:String):void
+        {
+            _dataObject.playerName = value;
+        }
+
+        public function get playerClass():String
+        {
+            return _dataObject.playerClass;
+        }
+
+        public function set playerClass(value:String):void
+        {
+            _dataObject.playerClass = value;
+        }
     }
 }

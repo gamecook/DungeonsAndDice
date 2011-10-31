@@ -22,6 +22,7 @@
 
 package
 {
+    import com.gamecook.dungeonsanddice.activities.SlideActivityManager;
     import com.gamecook.frogue.tiles.TileTypes;
     import com.gamecook.dungeonsanddice.activities.SplashActivity;
     import com.gamecook.dungeonsanddice.analytics.GoogleTracker;
@@ -88,7 +89,7 @@ package
 
             // Passes up a custom ActivityManager to super along with the start activity and scale.
             //super(new ActivityManager(tracker), InventoryActivity, 0, 0, scale);
-            super(new ActivityManager(tracker), SplashActivity, 0, 0, scale);
+            super(new SlideActivityManager(tracker), SplashActivity, 0, 0, scale);
             //super(new ActivityManager(tracker), LoadingActivity, 0, 0, scale);
 
             stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);

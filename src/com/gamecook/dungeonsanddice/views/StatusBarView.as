@@ -30,6 +30,10 @@
 package com.gamecook.dungeonsanddice.views
 {
     import com.gamecook.dungeonsanddice.factories.TextFieldFactory;
+    import com.gamecook.dungeonsanddice.states.ActiveGameState;
+    import com.gamecook.frogue.sprites.SpriteSheet;
+
+    import flash.display.DisplayObject;
 
     import flash.display.Sprite;
     import flash.text.TextField;
@@ -38,57 +42,45 @@ package com.gamecook.dungeonsanddice.views
     {
         [Embed(source='../../../../../build/assets/fonts/nokiafc22.ttf', fontName="system", embedAsCFF=false, mimeType="application/x-font-truetype")]
         private static var EMBEDDED_FONT:String;
-        private var scoreTF:TextField;
-        private var levelTF:TextField;
-        //private var turnsTF:TextField;
-
+        private var playerLabel:TextField;
         private var _message:TextField;
+        private var state:ActiveGameState;
+        private var nextLevel:DisplayObject;
+        private var inventoryPreview:Sprite;
+        private var spriteSheet:SpriteSheet;
 
-        public function StatusBarView()
+        public function StatusBarView(state:ActiveGameState)
         {
-            createDisplays();
+            this.state = state;
+            createDisplay();
         }
 
-        private function createDisplays():void
+        private function createDisplay():void
         {
-            scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, TextFieldFactory.INVENTORY_LABEL + TextFieldFactory.padScore(), 150)) as TextField;
+            //TODO remove Test Data
+            state.playerClass = "Player Class";
+            state.playerName  = "Player Name";
+            state.playerLevel  = 99;
 
-            /*levelTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, TextFieldFactory.KILL_LABEL + TextFieldFactory.padLevel())) as TextField;
-            levelTF.x = scoreTF.x + scoreTF.width;*/
+            playerLabel = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>"+state.playerName + "</span>  <span class='grey'>"+state.playerClass+"</span>", 150)) as TextField;
+            nextLevel = addChild(new NextLevelView(state));
+            nextLevel.y = playerLabel.y + playerLabel.height;
 
-           /* turnsTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel())) as TextField;
-            turnsTF.x = levelTF.x + levelTF.width;*/
+            inventoryPreview = addChild(new InventoryPreviewView(state)) as Sprite;
+            inventoryPreview.y = nextLevel.y + nextLevel.height + 5;
 
             _message = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "", 150)) as TextField;
             _message.y = 140;
-            clear();
+            clearMessage();
         }
-
-        public function updateStats(score:int, kills:int, inventory:int):void
-        {
-            scoreTF.htmlText = TextFieldFactory.SCORE_LABEL + " " + TextFieldFactory.padScore(score.toString()) +"  "+ TextFieldFactory.KILL_LABEL + " "+ TextFieldFactory.padScore(kills.toString()) + "\n"+ TextFieldFactory.INVENTORY_LABEL.replace("@percent@",inventory.toString() );
-        }
-
-        public function setLevel(value:int):void
-        {
-            //levelTF.htmlText = ;
-        }
-
-       /* public function setTurns(value:int):void
-        {
-            //turnsTF.htmlText = TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel(value.toString());
-        }*/
 
         public function setMessage(value:String):void
         {
             _message.htmlText = value;
         }
 
-        public function clear():void
+        public function clearMessage():void
         {
-            scoreTF.htmlText = TextFieldFactory.SCORE_LABEL + " " +TextFieldFactory.padScore() + "  " +TextFieldFactory.KILL_LABEL + TextFieldFactory.padLevel();
-            //levelTF.htmlText = ;
-            //turnsTF.htmlText = TextFieldFactory.TURNS_LABEL + TextFieldFactory.padLevel();
             _message.htmlText = "";
         }
 

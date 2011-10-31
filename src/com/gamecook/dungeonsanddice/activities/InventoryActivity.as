@@ -11,6 +11,7 @@ package com.gamecook.dungeonsanddice.activities
     import com.flashartofwar.behaviors.EaseScrollBehavior;
     import com.flashartofwar.ui.Slider;
     import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
+    import com.gamecook.dungeonsanddice.views.InventoryPreviewView;
     import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.sprites.SpriteSheet;
     import com.gamecook.frogue.tiles.TileTypes;
@@ -36,10 +37,6 @@ package com.gamecook.dungeonsanddice.activities
 
     public class InventoryActivity extends LogoActivity implements IMenuOptions
     {
-
-        [Embed(source="../../../../../build/assets/inventory_text.png")]
-        private var InventoryText:Class;
-
         private var spriteSheet:SpriteSheet = SingletonManager.getClassReference(SpriteSheet);
         private var bitmapScroller:BitmapScroller;
         private var slider:Slider;
@@ -50,8 +47,8 @@ package com.gamecook.dungeonsanddice.activities
         private var bitmapData:BitmapData;
         private var coinContainer:Bitmap;
         private var offset:int = 55;
-        private var unlockedPercent:Number = 0;
         private var statsTF:TextField;
+        private var inventoryPreview:InventoryPreviewView;
 
         public function InventoryActivity(activityManager:IActivityManager, data:*)
         {
@@ -64,9 +61,10 @@ package com.gamecook.dungeonsanddice.activities
 
             super.onCreate();
 
-            var inventoryText:Bitmap = addChild(new InventoryText()) as Bitmap;
+            var inventoryText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='grey'>Your Inventory shows all of the equipment that have been found while playing the game.</span>",150)) as TextField
+
             inventoryText.x = (HUD_WIDTH - inventoryText.width) * .5;
-            inventoryText.y = 65;
+            inventoryText.y = 44;
 
             textFieldStamp = new TextField();
             textFieldStamp.autoSize = TextFieldAutoSize.LEFT;
@@ -77,22 +75,19 @@ package com.gamecook.dungeonsanddice.activities
             textFieldStamp.background = true;
             textFieldStamp.backgroundColor = 0x000000;
 
-            // DEBUG Code
-            SpriteSheetFactory.parseSpriteSheet(spriteSheet);
+            inventoryPreview = addChild(new InventoryPreviewView(activeState)) as InventoryPreviewView;
+            inventoryPreview.x = inventoryText.x;
+            inventoryPreview.y = inventoryText.y + inventoryText.height + 3;
 
             createCoinDisplay();
 
             statsTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, formatStatsText(), 160)) as TextField;
-            statsTF.x = coinContainer.x + coinContainer.width + HUD_PADDING;
+            statsTF.x = coinContainer.x + coinContainer.width + 10;
             statsTF.y = coinContainer.y;
 
             scrollerContainer = addChild(new Sprite()) as Sprite;
 
-            var unlockedLabel:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLarge, "Items Unlocked ", fullSizeWidth)) as TextField;
-            unlockedLabel.x = 10;
-            /*unlockedLabel.y = playerSprite.y + playerSprite.height;*/
-
-            offset = 55;
+            offset = 65;
 
             createScrubber();
             //Generate Bitmap Data
@@ -103,15 +98,19 @@ package com.gamecook.dungeonsanddice.activities
             bitmapData = generateBitmapSheets();
             bitmapScroller.bitmapDataCollection = [bitmapData];
 
-            unlockedLabel.htmlText += unlockedPercent + "%";
-
             createEaseScrollBehavior();
 
             scrollerContainer.rotation = 90;
             scrollerContainer.x = fullSizeHeight + (HUD_WIDTH - (HUD_PADDING + 10));
             scrollerContainer.y = offset;
 
-            addEventListener(MouseEvent.CLICK, onClick)
+            addEventListener(MouseEvent.CLICK, onClick);
+
+            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Simply click on any of the equipment to customize your player.</span>",150)) as TextField
+
+            instructionText.x = (HUD_WIDTH - instructionText.width) * .5;
+            instructionText.y = HUD_MESSAGE_Y + 5;
+
         }
 
         override public function onStart():void
@@ -183,7 +182,8 @@ package com.gamecook.dungeonsanddice.activities
 
                 totalMoney += total * (i + 1);
             }
-            coinContainer.x = HUD_WIDTH + HUD_PADDING;
+            coinContainer.x = HUD_WIDTH + 10;
+            coinContainer.y = 5;
 
             textFieldStamp.textColor = 0xf1f102;
             textFieldStamp.text = "COINS: $" + totalMoney;
@@ -278,7 +278,6 @@ package com.gamecook.dungeonsanddice.activities
             var currentColumn:int = 0;
             var currentRow:int = 0;
             var foundColorMatrix:ColorTransform = new ColorTransform();
-            var unlocked:int = 0;
             var unlockedEquipment:Array = activeState.getUnlockedEquipment();
             var newX:int;
             var newY:int;
@@ -312,7 +311,6 @@ package com.gamecook.dungeonsanddice.activities
                     foundColorMatrix.blueOffset =
                     foundColorMatrix.redOffset =
                     foundColorMatrix.greenOffset = 0;
-                    unlocked ++;
                 }
 
                 currentPage.draw(spriteSheet.getSprite(TileTypes.getEquipmentPreview(sprites[i])), matrix, foundColorMatrix);
@@ -329,8 +327,6 @@ package com.gamecook.dungeonsanddice.activities
                 }
 
             }
-
-            unlockedPercent = Math.round(unlocked / total * 100);
 
             // Rotate the bitmap for the scroller
             var rotatedBMD:BitmapData = new BitmapData(currentPage.height, currentPage.width, true, 0);

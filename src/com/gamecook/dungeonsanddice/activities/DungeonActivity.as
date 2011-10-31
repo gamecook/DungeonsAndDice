@@ -38,9 +38,6 @@ import flash.text.TextField;
     public class DungeonActivity extends LogoActivity implements IMenuOptions
     {
 
-        [Embed(source="../../../../../build/assets/inventory_text.png")]
-        private var InventoryText:Class;
-
         private var spriteSheet:SpriteSheet = SingletonManager.getClassReference(SpriteSheet);
         private var bitmapScroller:BitmapScroller;
         private var slider:Slider;
@@ -62,10 +59,6 @@ import flash.text.TextField;
 
             super.onCreate();
 
-            var inventoryText:Bitmap = addChild(new InventoryText()) as Bitmap;
-            inventoryText.x = (HUD_WIDTH - inventoryText.width) * .5;
-            inventoryText.y = 65;
-
             textFieldStamp = new TextField();
             textFieldStamp.autoSize = TextFieldAutoSize.LEFT;
             textFieldStamp.antiAliasType = AntiAliasType.ADVANCED;
@@ -75,14 +68,8 @@ import flash.text.TextField;
             textFieldStamp.background = true;
             textFieldStamp.backgroundColor = 0x000000;
 
-            // DEBUG Code
-            //SpriteSheetFactory.parseSpriteSheet(spriteSheet);
-
             scrollerContainer = addChild(new Sprite()) as Sprite;
 
-            var unlockedLabel:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLarge, "Items Unlocked ", fullSizeWidth)) as TextField;
-            unlockedLabel.x = 10;
-            /*unlockedLabel.y = playerSprite.y + playerSprite.height;*/
 
             offset = 55;
 
@@ -102,6 +89,11 @@ import flash.text.TextField;
             scrollerContainer.y = offset;
 
             scrollerContainer.addEventListener(MouseEvent.CLICK, onClick);
+
+            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Pick a Dungeon to explore. Unlock more dungeons by gaining experience.</span>",150)) as TextField
+
+            instructionText.x = (HUD_WIDTH - instructionText.width) * .5;
+            instructionText.y = HUD_MESSAGE_Y + 5;
 
         }
 

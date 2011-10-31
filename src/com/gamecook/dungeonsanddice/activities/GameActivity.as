@@ -182,9 +182,9 @@ package com.gamecook.dungeonsanddice.activities
             var typeCount:int = 2;
             var tileBitmap:Bitmap;
             */
-            statusBar = addChild(new StatusBarView()) as StatusBarView;
-            statusBar.x = HUD_PADDING;
-            statusBar.y = 50;
+            statusBar = addChild(new StatusBarView(activeState)) as StatusBarView;
+            statusBar.x = HUD_PADDING-2;
+            statusBar.y = 45;
 
             activeState.levelTurns = 0;
 
@@ -365,7 +365,7 @@ package com.gamecook.dungeonsanddice.activities
 
         private function updateStatusBar():void
         {
-            statusBar.updateStats(activeState.score, activeState.totalKills, activeState.unlockPercentage);
+            //statusBar.updateStats(activeState.score, activeState.totalKills, activeState.unlockPercentage);
             //statusBar.setLevel(activeState.playerLevel, "<span class='lightGray'>-"+DifficultyLevels.getLabel(difficulty).substr(0,1).toUpperCase())+"</span>";
             //statusBar.setTurns(activeState.levelTurns);
         }

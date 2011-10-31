@@ -67,9 +67,9 @@ package com.gamecook.dungeonsanddice.activities
 
             //TODO For debug set to activity you want to test and comment out StartActivity.
             // Go to the main activity after 3 seconds
-            //startNextActivityTimer(StartActivity, 3);
+            startNextActivityTimer(StartActivity, 3);
             //startNextActivityTimer(DungeonActivity, 0);
-            startNextActivityTimer(GameActivity, 0);
+            //startNextActivityTimer(GameActivity, 0);
         }
     }
 }

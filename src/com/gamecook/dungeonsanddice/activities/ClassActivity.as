@@ -11,7 +11,8 @@ package com.gamecook.dungeonsanddice.activities
     import com.flashartofwar.behaviors.EaseScrollBehavior;
     import com.flashartofwar.ui.Slider;
     import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
-    import com.gamecook.frogue.enum.SlotsEnum;
+import com.gamecook.dungeonsanddice.views.DiceView;
+import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.sprites.SpriteSheet;
     import com.gamecook.frogue.tiles.TileTypes;
     import com.gamecook.dungeonsanddice.factories.SpriteFactory;
@@ -35,8 +36,10 @@ import flash.text.StyleSheet;
 import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
 
-    public class DungeonActivity extends LogoActivity implements IMenuOptions
+    public class ClassActivity extends LogoActivity implements IMenuOptions
     {
+        [Embed(source="../../../../../build/assets/dice_spritesheet.png")]
+        private var DiceSpriteSheet:Class;
 
         private var spriteSheet:SpriteSheet = SingletonManager.getClassReference(SpriteSheet);
         private var bitmapScroller:BitmapScroller;
@@ -47,8 +50,17 @@ import flash.text.TextField;
         private var textFieldStamp:TextField;
         private var bitmapData:BitmapData;
         private var offset:int = 55;
+        private var classText:Array = [
+        {name: "Knight", description: "Roll 2 or more sixes. Immediately take 1 point of life from the monster."},
+        {name: "Mage", description: "Roll 3 or more threes. Restore health to full amount."},
+        {name: "Thief", description: "Win with a two pair. Roll a single dice after combat. Add the value to the player’s score."},
+        {name: "Ranger", description: "Attack with high card. Take 1 point of life from monster regardless of attacker’s hand."},
+        {name: "Barbarian", description: "Roll five of a kind. Multiply attack value by 2."}];
+        private var diceSpriteSheet:SpriteSheet;
+        private var playerDiceContainer:Sprite;
+        private var playerDiceInstances:Array = [];
 
-        public function DungeonActivity(activityManager:IActivityManager, data:*)
+        public function ClassActivity(activityManager:IActivityManager, data:*)
         {
             super(activityManager, data);
         }
@@ -59,14 +71,20 @@ import flash.text.TextField;
 
             super.onCreate();
 
+            createDiceSpriteSheet();
+            displayContextualButton("BACK");
+
             textFieldStamp = new TextField();
             textFieldStamp.autoSize = TextFieldAutoSize.LEFT;
             textFieldStamp.antiAliasType = AntiAliasType.ADVANCED;
             textFieldStamp.sharpness = 200;
             textFieldStamp.embedFonts = true;
             textFieldStamp.defaultTextFormat = TextFieldFactory.textFormatSmall;
-            textFieldStamp.background = true;
+            textFieldStamp.background = false;
             textFieldStamp.backgroundColor = 0x000000;
+            textFieldStamp.multiline = true;
+            textFieldStamp.wordWrap = true;
+            textFieldStamp.width = 150;
 
             scrollerContainer = addChild(new Sprite()) as Sprite;
 
@@ -76,7 +94,7 @@ import flash.text.TextField;
             createScrubber();
             //Generate Bitmap Data
             bitmapScroller = scrollerContainer.addChild(new BitmapScroller(null, "auto", true)) as BitmapScroller;
-            bitmapScroller.width = fullSizeHeight - offset;
+            bitmapScroller.width = fullSizeHeight - offset - 43;
             bitmapScroller.height = fullSizeWidth;
 
             bitmapData = generateBitmapSheets();
@@ -90,11 +108,56 @@ import flash.text.TextField;
 
             addEventListener(MouseEvent.CLICK, onClick);
 
-            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Pick a Dungeon to explore. Unlock more dungeons by gaining experience.</span>",150)) as TextField
+            var descriptionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='grey'>Time to create a new character. Assign a dice value to your character’s <span class='white'>Attack</span>, <span class='white'>Defense</span> and <span class='white'>Life</span> values.</span>",150)) as TextField
+            descriptionText.x = HUD_PADDING;
+            descriptionText.y = 48;
+
+            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Click on the property above, then the dice you want to assign it to.</span>",150)) as TextField
 
             instructionText.x = (HUD_WIDTH - instructionText.width) * .5;
             instructionText.y = HUD_MESSAGE_Y + 5;
 
+            createPlayerDice();
+
+        }
+
+        private function createDiceSpriteSheet():void
+        {
+            diceSpriteSheet = new SpriteSheet();
+            var tileSize:int = 40;
+            var bitmap:Bitmap = new DiceSpriteSheet();
+            diceSpriteSheet.bitmapData = bitmap.bitmapData;
+            var i:int;
+            var total:int = Math.floor(bitmap.width / tileSize);
+            var spriteRect:Rectangle = new Rectangle(0, 0, tileSize, tileSize);
+            for (i = 0; i < total; ++i)
+            {
+                spriteRect.x = i * tileSize;
+                diceSpriteSheet.registerSprite("sprite" + i, spriteRect.clone());
+            }
+        }
+
+        private function createPlayerDice():void
+        {
+            playerDiceContainer = addChild(new Sprite()) as Sprite;
+            createDiceGroup(playerDiceContainer, playerDiceInstances);
+            playerDiceContainer.x = ((BACKGROUND_WIDTH - playerDiceContainer.width) * .5) + HUD_WIDTH;
+            playerDiceContainer.y =fullSizeHeight - playerDiceContainer.height - 2;
+        }
+
+        private function createDiceGroup(container:Sprite, instanceCollection:Array):void
+        {
+            var total:int = 5;
+            var i:int;
+            var dice:DiceView;
+            var padding:int = 4;
+            for (i = 0; i < total; i++)
+            {
+                dice = container.addChild(new DiceView(diceSpriteSheet)) as DiceView;
+                dice.x = (dice.width+padding) * i;
+                dice.roll();
+                instanceCollection.push(dice);
+            }
         }
 
         private function testButtonPress():void
@@ -108,13 +171,13 @@ import flash.text.TextField;
             for (var id:String in instancesRects)
             {
                 rect = instancesRects[id];
-                //trace("Hit Test", rect.contains(x, y));
+                trace("Hit Test", rect.contains(x, y), rect);
                 //TODO need to test if the level has been unlocked
                 if (rect.contains(x, y) /*&& (activeState.getUnlockedEquipment().indexOf(id) != -1)*/)
                 {
-                    trace("Hit", id);
+                    trace("Select Class", id);
 
-                    nextActivity(NewGameActivity, {dungeon:id});
+                    nextActivity(DungeonActivity, {classID:id});
 
                     return;
                 }
@@ -125,7 +188,7 @@ import flash.text.TextField;
         override public function onStart():void
         {
             super.onStart();
-            displayContextualButton("BACK");
+
         }
 
         override protected function onContextualButtonClick(event:MouseEvent):void
@@ -143,7 +206,7 @@ import flash.text.TextField;
             //var sprites:Array = SpriteFactory.equipment.slice();
 
             var i:int = 0;
-            var total:int = 9;//sprites.length;
+            var total:int = classText.length;
             var padding:int = 20;
             var inventoryWidth:int = BACKGROUND_WIDTH - 20;
             var columns:int = 1;
@@ -161,19 +224,19 @@ import flash.text.TextField;
             var unlockedEquipment:Array = activeState.getUnlockedEquipment();
             var newX:int;
             var newY:int;
-
             textFieldStamp.textColor = 0xffffff;
             var styles:StyleSheet = new StyleSheet();
             styles.parseCSS(TextFieldFactory.css);
             textFieldStamp.styleSheet = styles;
 
             var spriteName:String;
+            var classObject:Object;
 
             for (i = 0; i < total; i++)
             {
                 currentColumn = i % columns;
-
-                spriteName = "M"+(i+1);
+                classObject = classText[i];
+                spriteName = "@";//+(i+1);
                 var matrix:Matrix = new Matrix();
 
                 newX = (currentColumn * (SpriteSheetFactory.TILE_SIZE + padding + rightMargin) + leftMargin);
@@ -181,7 +244,7 @@ import flash.text.TextField;
 
                 matrix.translate(newX, newY);
 
-                instancesRects[spriteName] = new Rectangle(newX, newY, 200, 40);
+                instancesRects[i] = new Rectangle(newX, newY, 200, 40);
 
                 // test if item is found
                 /*if (unlockedEquipment.indexOf(sprites[i]) == -1)
@@ -198,9 +261,10 @@ import flash.text.TextField;
                     unlocked ++;
                 }*/
 
+
                 currentPage.draw(spriteSheet.getSprite(TileTypes.getTileSprite(spriteName)), matrix, foundColorMatrix);
 
-                textFieldStamp.htmlText = "Dungeon "+(i+1)+" unlocked\n<span class='grey'>Monster: "+TileTypes.getTileName(spriteName)+"s</span>";
+                textFieldStamp.htmlText = classObject.name+" - <span class='grey'>"+classObject.description+"</span>";
 
                 matrix.translate(SpriteSheetFactory.TILE_SIZE + 5, 0);
                 currentPage.draw(textFieldStamp, matrix, foundColorMatrix);
@@ -226,7 +290,7 @@ import flash.text.TextField;
 
         private function createScrubber():void
         {
-            var sWidth:int = fullSizeHeight - offset;
+            var sWidth:int = fullSizeHeight - offset - 43;
             var sHeight:int = 20;
             var dWidth:int = 60;
             var corners:int = 0;

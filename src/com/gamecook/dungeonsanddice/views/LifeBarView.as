@@ -22,7 +22,9 @@
 
 package com.gamecook.dungeonsanddice.views
 {
-    import flash.display.Bitmap;
+import com.greensock.TweenLite;
+
+import flash.display.Bitmap;
     import flash.display.Shape;
     import flash.display.Sprite;
 
@@ -44,10 +46,10 @@ package com.gamecook.dungeonsanddice.views
             backgroundImage = addChild(new LifeBarBackground) as Bitmap;
 
             //Draw Lifebar
-            var padding:int = 2;
+            var padding:int = 1;
 
             lifeBar = addChild(new Shape()) as Shape;
-            lifeBar.graphics.beginFill(0xFF0000);
+            lifeBar.graphics.beginFill(0x50c819);
             lifeBar.graphics.drawRect(0, 0, backgroundImage.width - (padding * 2), backgroundImage.height - (padding * 2));
             lifeBar.graphics.endFill();
             lifeBar.x = lifeBar.y = padding;
@@ -68,7 +70,7 @@ package com.gamecook.dungeonsanddice.views
 
         private function updateLifeBar():void
         {
-            lifeBar.scaleY = 1 - life / maxLife;
+            TweenLite.to(lifeBar, .3, {scaleX: life/maxLife});
         }
     }
 }

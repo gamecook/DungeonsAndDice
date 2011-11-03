@@ -216,7 +216,7 @@ package com.gamecook.dungeonsanddice.activities
             soundManager.play(MHSoundClasses.WallHit);
             event.target.removeEventListener(MouseEvent.MOUSE_UP, onNewGame);
             //nextActivity(NewGameActivity);
-            nextActivity(DungeonActivity);
+            nextActivity(ClassActivity);
 
         }
 

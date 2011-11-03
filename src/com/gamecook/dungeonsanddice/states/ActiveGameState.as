@@ -26,11 +26,11 @@ package com.gamecook.dungeonsanddice.states
 
     public class ActiveGameState extends AbstractStateObject
     {
-        private const MATCH_HACK:String = "dungeonsanddice";
+        private const GAME_NAME:String = "dungeonsanddice";
 
         public function ActiveGameState()
         {
-            super(this, MATCH_HACK)
+            super(this, GAME_NAME);
         }
 
         public function get activeGame():Boolean
@@ -77,17 +77,6 @@ package com.gamecook.dungeonsanddice.states
         {
             _dataObject.difficulty = value;
         }
-
-        /*
-         public function get turns():int
-         {
-         return _dataObject.turns;
-         }
-
-         public function set turns(value:int):void
-         {
-         _dataObject.turns = value;
-         }*/
 
         public function get score():int
         {
@@ -253,13 +242,6 @@ package com.gamecook.dungeonsanddice.states
             if (!_dataObject.totalKills)
                 _dataObject.totalTurns = 0;
             return _dataObject.totalKills ++;
-        }
-
-        public function get unlockPercentage():int {
-
-            return 0;
-            //TODOD this need
-            //return Math.round(unlocked / total * 100);
         }
 
         public function get playerName():String

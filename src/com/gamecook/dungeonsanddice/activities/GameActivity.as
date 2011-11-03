@@ -23,7 +23,8 @@
 
 package com.gamecook.dungeonsanddice.activities
 {
-    import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
+import com.gamecook.dungeonsanddice.threads.DiceRollThread;
+import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
     import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
     import com.gamecook.dungeonsanddice.views.DiceView;
     import com.gamecook.dungeonsanddice.views.DiceView;
@@ -45,9 +46,11 @@ package com.gamecook.dungeonsanddice.activities
     import com.gamecook.dungeonsanddice.views.IMenuOptions;
     import com.gamecook.dungeonsanddice.views.MenuBar;
     import com.gamecook.dungeonsanddice.views.StatusBarView;
-    import com.jessefreeman.factivity.activities.IActivityManager;
+import com.greensock.TweenMax;
+import com.jessefreeman.factivity.activities.IActivityManager;
     import com.jessefreeman.factivity.managers.SingletonManager;
-    import com.jessefreeman.factivity.threads.effects.Quake;
+import com.jessefreeman.factivity.threads.IRunnable;
+import com.jessefreeman.factivity.threads.effects.Quake;
     import com.jessefreeman.factivity.threads.effects.TypeTextEffect;
     import com.jessefreeman.factivity.utils.DeviceUtil;
 
@@ -85,8 +88,6 @@ package com.gamecook.dungeonsanddice.activities
         private var TileHighlightImage:Class;
 
         private var flipping:Boolean;
-        private var activeTiles:Array = [];
-        private var maxActiveTiles:int = 1;
         private var tileContainer:Sprite;
         private var player:CharacterView;
         private var monster:CharacterView;
@@ -97,19 +98,19 @@ package com.gamecook.dungeonsanddice.activities
         private var textEffect:TypeTextEffect;
         private var bonusLabel:TextField;
         private var gameBackground:Bitmap;
-        private var highlightInstances:Array = [];
         private var debug:Boolean = false;
         private var monsterCounter:int = 0;
         private var monsterAttackDelay:int = 15000;
         private var attackWarningLabel:TextField;
         private var playerDiceInstances:Array = [];
         private var monsterDiceInstances:Array = [];
+        private var round:int = 0;
         private var diceSpriteSheet:SpriteSheet;
         private var playerDiceContainer:Sprite;
         private var monsterDiceContainer:Sprite;
-        private var round:int = 0;
         private var maxRounds:int = 2;
         private var characterGroup:Sprite;
+        private var diceRollThread:DiceRollThread;
 
         public function GameActivity(activityManager:IActivityManager, data:*)
         {
@@ -129,6 +130,8 @@ package com.gamecook.dungeonsanddice.activities
 
             // Set the difficulty level from the active state object
             difficulty = activeState.difficulty;
+
+            diceRollThread = new DiceRollThread(250, 5, onRollDice, onDiceRollComplete)
         }
 
 
@@ -305,7 +308,7 @@ package com.gamecook.dungeonsanddice.activities
 
             for(i = 0; i < total; i++)
             {
-                dice = collection[i]
+                dice = collection[i];
                 if(!dice.selected)
                     dice.roll();
             }
@@ -360,6 +363,7 @@ package com.gamecook.dungeonsanddice.activities
 
         private function onTextEffectUpdate():void
         {
+            //trace("Text Update");
             //soundManager.play(MHSoundClasses.TypeSound);
         }
 
@@ -378,31 +382,40 @@ package com.gamecook.dungeonsanddice.activities
          */
         private function onClick(event:MouseEvent):void
         {
+            if(diceRollThread.isRunning() || monster.isDead || player.isDead)
+                return;
+
             // Clear status message
             statusBar.setMessage("");
 
             resetMonsterAttackCounter();
 
+            addThread(diceRollThread);
+
+
+        }
+
+        private function onRollDice():void
+        {
+            rollDice(playerDiceInstances);
+            rollDice(monsterDiceInstances);
+        }
+
+        private function onDiceRollComplete()
+        {
+            var rank1 : Object = DicePokerValidationUtil.rankHand(getDiceValues(playerDiceInstances));
+            var rank2 : Object = DicePokerValidationUtil.rankHand(getDiceValues(monsterDiceInstances));
+
             if(round < maxRounds)
             {
-                rollDice(playerDiceInstances);
-                rollDice(monsterDiceInstances);
-                var rank1 : Object = DicePokerValidationUtil.rankHand(getDiceValues(playerDiceInstances));
-                var rank2 : Object = DicePokerValidationUtil.rankHand(getDiceValues(monsterDiceInstances));
+                updateStatusMessage("<span class='orange'>Round "+(round+1)+":</span>\n\n<span class='orange'>Player has a "+rank1.type+"\nMonster has " +rank2.type+"</span>");
 
-                updateStatusMessage("Round "+(round+1)+": Player 1 has "+rank1.type+" ("+rank1.rank+")\n Monster has " +rank2.type+" ("+rank2.rank+")");
                 round++;
             }
             else
             {
-                var rank1 : Object = DicePokerValidationUtil.rankHand(getDiceValues(playerDiceInstances));
-                var rank2 : Object = DicePokerValidationUtil.rankHand(getDiceValues(monsterDiceInstances));
-
-                resetRound();
-
                 if(rank1.rank > rank2.rank)
                 {
-
                     increaseBonus();
                     attack(player, monster, rank1.typeID);
                 }
@@ -417,50 +430,9 @@ package com.gamecook.dungeonsanddice.activities
                 else if(player.isDead)
                     onPlayerDead();
 
+                resetRound();
 
             }
-            // Test to see if a tile is flipping
-            /*if (!flipping)
-            {
-                // Play flip sound
-                soundManager.play(MHSoundClasses.WallHit);
-
-                // Get instance of the currently selected PaperSprite
-                var target:PaperSprite = event.target as PaperSprite;
-
-                // If this tile is already active exit the method
-                if ((activeTiles.indexOf(target) != -1) || player.isDead)
-                    return;
-
-                // push the tile into the active tile array
-                activeTiles.push(target);
-
-                var highlight:Bitmap = highlightInstances[activeTiles.length - 1];
-                highlight.visible = true;
-                highlight.x = target.x - (target.width * .5) + 1;
-                highlight.y = target.y - (target.height * .5) + 1;
-
-                // Check if the debug mode is on, we need to do handle this differently.
-                if (!debug)
-                {
-
-                    // We are about to flip the tile. Add a complete event listener so we know when it's done.
-                    target.addEventListener(Event.COMPLETE, onFlipComplete);
-
-                    // Flip the tile
-                    target.flip();
-
-                    // Set the flipping flag.
-                    flipping = true;
-                }
-                else
-                {
-                    // If difficulty was set to 1 (easy) there is no flip so manually call endTurn.
-                    endTurn();
-                }
-
-            }*/
-
         }
 
         private function resetRound():void
@@ -471,7 +443,7 @@ package com.gamecook.dungeonsanddice.activities
             var i:int;
             for (i =0; i<total; i++)
             {
-                DiceView(playerDiceInstances[i]).reset();
+                DiceView(playerDiceInstances[i]).reset()
                 DiceView(monsterDiceInstances[i]).reset();
             }
         }
@@ -512,108 +484,7 @@ package com.gamecook.dungeonsanddice.activities
             flipping = false;
 
             // End the turn.
-            endTurn();
-        }
-
-        /**
-         *
-         * This validates if we have reached the total number of active tiles. If so we need to check for matches and
-         * handle any related game logic.
-         *
-         */
-        private function endTurn():void
-        {
-
-            // See if we have active the maximum active tiles allowed.
-            if (activeTiles.length > maxActiveTiles)
-            {
-                // Validate any matches
-                findMatches();
-
-                // Reset any tiles that do not match
-                resetActiveTiles();
-
-                // Increment our turns counter in the activeState object
-                activeState.levelTurns ++;
-                activeState.increaseTotalTurns();
-            }
-
-        }
-
-        /**
-         *
-         * This method goes through all of the Active tiles and tries to identify any matches.
-         *
-         */
-        private function findMatches():void
-        {
-
-            var i:int, j:int;
-            var total:int = activeTiles.length;
-            var currentTile:PaperSprite;
-            var testTile:PaperSprite;
-            var tileName:String;
-            var match:Boolean;
-
-            // Loop through active tiles and compare each item to the rest of the tiles in the array.
-            for (i = 0; i < total; i++)
-            {
-                // save an instance of the current tile to test with
-                currentTile = activeTiles[i];
-                tileName = currentTile.name;
-                // Reloop through all the items starting back at the beginning
-                for (j = 0; j < total; j++)
-                {
-                    // select the item to test against
-                    testTile = activeTiles[j];
-                    // Make sure we aren't testing the same item
-                    if ((currentTile != testTile) && (currentTile.name == testTile.name))
-                    {
-                        // A match has been found so make sure the current tile and test tile are set to invisible.
-                        currentTile.visible = false;
-                        testTile.visible = false;
-
-                        // Flag that a match has been found.
-                        match = true;
-
-                    }
-                }
-
-                if (highlightInstances[i])
-                    highlightInstances[i].visible = false;
-            }
-
-            // Validate match
-            if (match)
-            {
-                onMatch(tileName);
-            }
-            else
-            {
-                // Update status message
-                updateStatusMessage("You did not find a match.\nYou lose 1 HP from the monster's attack.");
-                onNoMatch();
-            }
-
-        }
-
-        /**
-         *
-         * Loops through any active tiles and flips them. This only calls flip for any difficulty level higher then 1 (easy)
-         *
-         */
-        private function resetActiveTiles():void
-        {
-            // Loop through all tiles
-            for each (var tile:PaperSprite in activeTiles)
-            {
-                // Make sure the difficulty is higher then easy
-                if (!debug)
-                    tile.flip();
-            }
-
-            // Clear the activeTiles array when we are done.
-            activeTiles.length = 0;
+            //endTurn();
         }
 
         /**
@@ -659,59 +530,14 @@ package com.gamecook.dungeonsanddice.activities
             bonusLabel.visible = false;
         }
 
-        /**
-         *
-         * Called when a match is found.
-         *
-         */
-        private function onMatch(type:String):void
-        {
-            trace("Matched", type, type.substr(0, 1));
-
-            switch (type.substr(0, 1))
-            {
-                case "P":
-                    updateStatusMessage("Player drinks potion and restores " + (player.getMaxLife() - player.getLife()));
-                    trace("Found Potion");
-                    player.addLife(player.getMaxLife());
-                    increaseBonus();
-                    break
-
-                case "W":
-                    trace("Found Weapon");
-                    //playerAttack();
-                    break;
-
-                case "S":
-                case "H":
-                case "A":
-                case "B":
-                    trace("Found Armor");
-                    //playerAttack();
-                    break;
-
-                case "$":
-                    trace("Found Money");
-
-                    increaseBonus();
-                    break;
-
-                case "T":
-                    trace("Found Treasure");
-                    increaseBonus();
-                    break;
-
-
-            }
-
-            //playerAttack();
-
-            // Reset monster attack counter
-            monsterCounter = monsterAttackDelay;
-        }
-
         private function attack(attacker:CharacterView, target:CharacterView, bonus:int = 1):void
         {
+
+            // Attack Animation
+            var direction:Number = attacker.x > target.x ? -1 : 1;
+
+            TweenMax.to(attacker,  .3, {x: attacker.x + (10 * direction), yoyo: true, repeat: 1});
+
             if (quakeEffect)
             {
                 quakeEffect.target = target;
@@ -730,6 +556,7 @@ package com.gamecook.dungeonsanddice.activities
             // Play attack sound
             soundManager.play(MHSoundClasses.PotionSound);
 
+            //TODO capitalize first letter.
             // Update status message
             updateStatusMessage(attacker.name+" hits "+target.name+" for "+(1+bonus)+"HP points with a "+DicePokerValidationUtil.getType(bonus));
 
@@ -767,11 +594,11 @@ package com.gamecook.dungeonsanddice.activities
          */
         private function onPlayerDead():void
         {
-            if (quakeEffect)
+            /*if (quakeEffect)
             {
                 removeThread(quakeEffect)
             }
-
+            */
             // Update status message
             updateStatusMessage("You have been defeated!");
 
@@ -798,10 +625,10 @@ package com.gamecook.dungeonsanddice.activities
          */
         private function onMonsterDead():void
         {
-            if (quakeEffect)
+            /*if (quakeEffect)
             {
                 removeThread(quakeEffect)
-            }
+            }*/
 
             //Save State
             activeState.playerLife = player.getLife();
@@ -848,7 +675,7 @@ package com.gamecook.dungeonsanddice.activities
 
         public function updateStatusMessage(value:String):void
         {
-            value = "<span class='orange'>"+value+"</span>";
+            //value = "<span class='orange'>"+value+"</span>";
 
             if (value.length > 0)
             {
@@ -856,16 +683,16 @@ package com.gamecook.dungeonsanddice.activities
                 {
                     textEffect.newMessage(value, 2);
                     addThread(textEffect);
-                    value = "";
+                    //value = "";
                 }
                 else
                 {
-                    statusBar.message.text = value;
+                    statusBar.message.htmlText = value;
                 }
             }
             else
             {
-                statusBar.message.text = value;
+                statusBar.message.htmlText = value;
             }
         }
 
@@ -924,6 +751,12 @@ package com.gamecook.dungeonsanddice.activities
         public function onPause()
         {
 
+        }
+
+
+        override protected function addThread(value:IRunnable):int {
+            trace("Adding Thread", value);
+            return super.addThread(value);
         }
     }
 }

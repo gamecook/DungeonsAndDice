@@ -7,7 +7,8 @@
  */
 package com.gamecook.dungeonsanddice.views
 {
-    import com.gamecook.frogue.sprites.SpriteSheet;
+import com.gamecook.dungeonsanddice.utils.ArrayUtil;
+import com.gamecook.frogue.sprites.SpriteSheet;
 
     import flash.display.Bitmap;
     import flash.display.BitmapData;
@@ -23,10 +24,17 @@ package com.gamecook.dungeonsanddice.views
         private var diceBitmap:Bitmap;
         private var highlightBitmap:Bitmap;
         private var sides:int;
+        private var sideValues:Array = [];
 
         public function DiceView(spriteSheet:SpriteSheet, sides:int = 6)
         {
             this.sides = sides;
+            var i:int;
+            for(i = 0; i < this.sides ; i++)
+            {
+                sideValues.push(i+1);
+            }
+
             this.spriteSheet = spriteSheet;
             diceBitmap = addChild(new Bitmap(new BitmapData(40,40,true,0x0))) as Bitmap;
             highlightBitmap = addChild(new Bitmap(spriteSheet.getSprite(spriteSheet.spriteNames[spriteSheet.spriteNames.length-1]))) as Bitmap;
@@ -46,6 +54,12 @@ package com.gamecook.dungeonsanddice.views
             return _selected;
         }
 
+        public function set selected(value:Boolean):void
+        {
+            _selected = value;
+            render();
+        }
+
         public function get value():int
         {
             return _value;
@@ -58,7 +72,8 @@ package com.gamecook.dungeonsanddice.views
         }
 
         public function roll() : int {
-			value = ((Math.random() * 1000) % sides) + 1;
+			sideValues = ArrayUtil.shuffleArray(sideValues);
+            value = sideValues[0] != value ? sideValues[0] : sideValues[1];
             return value;
 		}
 

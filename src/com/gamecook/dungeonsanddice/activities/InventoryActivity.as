@@ -197,18 +197,20 @@ package com.gamecook.dungeonsanddice.activities
 
         private function testButtonPress():void
         {
-            var x:int = mouseX;
+            var x:int = mouseX - HUD_WIDTH;
             var y:int = (mouseY - scrollerContainer.y) + bitmapScroller.scrollX;
             var matrix:Matrix = new Matrix();
             var rect:Rectangle;
             var stamp:BitmapData;
+
             for (var id:String in instancesRects)
             {
                 rect = instancesRects[id];
+                //trace("Hit Test", rect.contains(x, y));
                 if (rect.contains(x, y) && (activeState.getUnlockedEquipment().indexOf(id) != -1))
                 {
-                    trace("Equip", id);
-                    //textFieldStamp.textColor = 0xff0000;
+                    /*trace("Equip", id);
+                    textFieldStamp.textColor = 0xff0000;
                     textFieldStamp.text = TileTypes.getTileName(id);
 
                     //stamp = new BitmapData(textFieldStamp.width, textFieldStamp.height);
@@ -216,8 +218,8 @@ package com.gamecook.dungeonsanddice.activities
                     matrix.rotate(Math.PI * 2 * (-90 / 360));
                     matrix.translate(Math.round(rect.y + rect.height), Math.round((bitmapData.height - rect.x) - ((SpriteSheetFactory.TILE_SIZE - textFieldStamp.width) * .5)));
                     //matrix.translate(Math.round(,SpriteSheetFactory.TILE_SIZE - bitmapData.  );
-                    //bitmapData.draw(textFieldStamp, matrix, null, null, null, true);
-                    //bitmapScroller.invalidate(BitmapScroller.INVALID_VISUALS);
+                    bitmapData.draw(textFieldStamp, matrix, null, null, null, true);
+                    bitmapScroller.invalidate(BitmapScroller.INVALID_VISUALS);*/
 
                     switch (id.substr(0, 1))
                     {
@@ -256,6 +258,7 @@ package com.gamecook.dungeonsanddice.activities
                     updatePlayerDisplay();
                     return;
                 }
+
             }
         }
 

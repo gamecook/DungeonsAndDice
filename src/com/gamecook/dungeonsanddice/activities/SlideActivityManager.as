@@ -43,8 +43,8 @@ package com.gamecook.dungeonsanddice.activities
 
                 removeActivity();
 
-                TweenLite.to(lastLeftSide,1,{y:-BaseActivity.fullSizeHeight, delay: .2});
-                TweenLite.to(lastRightSide,1,{y:BaseActivity.fullSizeHeight, delay: .2,onComplete: removeLastActivityBitmap});
+                TweenLite.to(lastRightSide,1,{y:-BaseActivity.fullSizeHeight, delay: .2});
+                TweenLite.to(lastLeftSide,1,{y:BaseActivity.fullSizeHeight, delay: .2,onComplete: removeLastActivityBitmap});
             }
 
             newActivity.visible = false;
@@ -54,12 +54,12 @@ package com.gamecook.dungeonsanddice.activities
 
             var currentLeftSide:Bitmap = _target.addChild(currentActivityBitmap[0]) as Bitmap;
             var currentRightSide:Bitmap = _target.addChild(currentActivityBitmap[1]) as Bitmap;
-            currentLeftSide.y = BaseActivity.fullSizeHeight;
+            currentRightSide.y = BaseActivity.fullSizeHeight;
             currentRightSide.x = currentLeftSide.x + currentLeftSide.width;
-            currentRightSide.y = -BaseActivity.fullSizeHeight;
+            currentLeftSide.y = -BaseActivity.fullSizeHeight;
 
-            TweenLite.to(currentLeftSide,1,{y:0, delay: .2});
-            TweenLite.to(currentRightSide,1,{y:0, delay: .2, onComplete: showCurrentActivity});
+            TweenLite.to(currentRightSide,1,{y:0, delay: .2});
+            TweenLite.to(currentLeftSide,1,{y:0, delay: .2, onComplete: showCurrentActivity});
         }
 
         protected function removeLastActivityBitmap():void

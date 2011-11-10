@@ -31,7 +31,8 @@ import com.gamecook.dungeonsanddice.utils.DicePokerValidationUtil;
     import com.gamecook.dungeonsanddice.views.DiceView;
     import com.gamecook.dungeonsanddice.views.DiceView;
     import com.gamecook.dungeonsanddice.views.DiceView;
-    import com.gamecook.frogue.enum.SlotsEnum;
+import com.gamecook.dungeonsanddice.views.InventoryPreviewView;
+import com.gamecook.frogue.enum.SlotsEnum;
     import com.gamecook.frogue.equipment.IEquipable;
     import com.gamecook.frogue.sprites.SpriteSheet;
     import com.gamecook.frogue.tiles.MonsterTile;
@@ -131,7 +132,7 @@ import com.jessefreeman.factivity.threads.effects.Quake;
             // Set the difficulty level from the active state object
             difficulty = activeState.difficulty;
 
-            diceRollThread = new DiceRollThread(250, 5, onRollDice, onDiceRollComplete)
+            diceRollThread = new DiceRollThread(150, 5, onRollDice, onDiceRollComplete)
         }
 
 
@@ -189,6 +190,13 @@ import com.jessefreeman.factivity.threads.effects.Quake;
             statusBar.x = HUD_PADDING-2;
             statusBar.y = 45;
 
+            //connect inventory buttons
+            var weaponBox:InventoryPreviewView = statusBar.inventoryPreview;
+            weaponBox.buttonMode = true;
+            weaponBox.addEventListener(MouseEvent.CLICK, onInventoryButtonClick);
+
+            statusBar.inventoryPreview.inventoryLabel.htmlText = "Click below to open inventory."
+
             activeState.levelTurns = 0;
 
             createPlayer(total);
@@ -224,7 +232,7 @@ import com.jessefreeman.factivity.threads.effects.Quake;
             updateStatusBar();
 
             // Update status message
-            updateStatusMessage("You have entered level " + activeState.playerLevel + " of the dungeon.\nClick to roll your first attack.");
+            updateStatusMessage("You have entered level " + activeState.dungeonLevel + " of the dungeon.\nClick to roll your first attack.");
 
             // Setup monster timer
             if (difficulty == 1)
@@ -250,6 +258,14 @@ import com.jessefreeman.factivity.threads.effects.Quake;
             characterGroup.x = ((tileContainer.width - characterGroup.width) * .5);
             characterGroup.y = (tileContainer.height - characterGroup.height) * .5;
 
+        }
+
+        private function onUsePotion(event:MouseEvent):void {
+            trace("Use Potion");
+        }
+
+        private function onInventoryButtonClick(event:MouseEvent):void {
+            nextActivity(InventoryActivity, {lastActivity: GameActivity});
         }
 
         private function createDiceSpriteSheet():void
@@ -391,7 +407,6 @@ import com.jessefreeman.factivity.threads.effects.Quake;
             resetMonsterAttackCounter();
 
             addThread(diceRollThread);
-
 
         }
 
@@ -753,10 +768,5 @@ import com.jessefreeman.factivity.threads.effects.Quake;
 
         }
 
-
-        override protected function addThread(value:IRunnable):int {
-            trace("Adding Thread", value);
-            return super.addThread(value);
-        }
     }
 }

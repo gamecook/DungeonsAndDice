@@ -66,7 +66,6 @@ package com.gamecook.dungeonsanddice.activities
         override public function onStart():void
         {
             super.onStart();
-
             var newGameLabel:Bitmap = addChild(new NewGame()) as Bitmap;
             newGameLabel.x = ((BACKGROUND_WIDTH - newGameLabel.width) * .5) + HUD_WIDTH;
             newGameLabel.y = logo.y + logo.height + 20;
@@ -129,7 +128,7 @@ package com.gamecook.dungeonsanddice.activities
 
             // Reset active state values
             activeState.difficulty = difficulty;
-            activeState.playerLevel = 1;
+            activeState.dungeonLevel = 1;
             activeState.activeGame = true;
 
             // Go to next activity, GameActivity

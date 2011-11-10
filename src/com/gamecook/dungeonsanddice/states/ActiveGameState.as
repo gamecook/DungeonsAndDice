@@ -43,14 +43,14 @@ package com.gamecook.dungeonsanddice.states
             _dataObject.activeGame = value;
         }
 
-        public function get playerLevel():int
+        public function get dungeonLevel():int
         {
-            return _dataObject.playerLevel;
+            return _dataObject.dungeonLevel;
         }
 
-        public function set playerLevel(value:int):void
+        public function set dungeonLevel(value:int):void
         {
-            _dataObject.playerLevel = value;
+            _dataObject.dungeonLevel = value;
         }
 
         public function get playerLife():int
@@ -164,9 +164,17 @@ package com.gamecook.dungeonsanddice.states
             _dataObject.levelTurns = 0;
             _dataObject.score = 0;
             _dataObject.turns = 0;
-            _dataObject.playerLevel = 0;
+            _dataObject.dungeonLevel = 0;
             _dataObject.activeGame = false;
             _dataObject.totalKills = 0;
+
+            _dataObject.playerExperience = 0;
+            _dataObject.equippedInventory = [];
+
+            //TODO need to figure out a way to save out max player level for unlocking maps
+            if(_dataObject.playerLevel > _dataObject.maxPlayerLevel)
+                _dataObject.maxPlayerLevel = _dataObject.playerLevel;
+
         }
 
         public function get equippedInventory():Array
@@ -262,6 +270,40 @@ package com.gamecook.dungeonsanddice.states
         public function set playerClass(value:String):void
         {
             _dataObject.playerClass = value;
+        }
+
+        public function increasePlayerExperience(value:int):void
+        {
+            _dataObject.playerExperience += value;
+
+            if(_dataObject.playerExperience >  calculateExperiencePoints(getPlayerLevel()+1))
+            {
+                increasePlayerLevel();
+            }
+        }
+
+        public function getPlayerExperience():int
+        {
+            if(!_dataObject.playerExperience)
+                _dataObject.playerExperience = 0;
+
+            return _dataObject.playerExperience;
+        }
+
+        public function getPlayerLevel():int{
+            if(!_dataObject.playerLevel)
+                _dataObject.playerLevel = 1;
+
+            return _dataObject.playerLevel;
+        }
+
+        public function increasePlayerLevel():void
+        {
+            _dataObject.playerLevel = getPlayerLevel()+1;
+        }
+
+        public function calculateExperiencePoints(level:int):int{
+            return (level * (level + 1)) * 100;
         }
     }
 }

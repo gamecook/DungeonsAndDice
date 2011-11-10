@@ -30,10 +30,10 @@ package com.gamecook.dungeonsanddice.views
         private var state:ActiveGameState;
         private var spriteSheet:SpriteSheet = SingletonManager.getClassReference(SpriteSheet);
 
-        private var inventoryLabel:TextField;
-        private var weaponBox:Sprite;
-        private var armorBox:Sprite;
-        private var potionBox:Sprite;
+        public var inventoryLabel:TextField;
+        public var weaponBox:Sprite;
+        public var armorBox:Sprite;
+        public var potionBox:Sprite;
 
         public function InventoryPreviewView(state:ActiveGameState)
         {
@@ -45,7 +45,7 @@ package com.gamecook.dungeonsanddice.views
         {
             //Need to make sure the level is padded by a space so it always is aligned with right side of level bar
 
-            inventoryLabel = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Inventory ("+calculateUnlockPercent()+"% discovered)</span>", 150)) as TextField;
+            inventoryLabel = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Inventory ("+calculateUnlockPercent()+"% discovered)</span>", 280)) as TextField;
 
             /*if (activeState.equippedInventory[SlotsEnum.ARMOR])
                 sprites.push(TileTypes.getTileSprite(activeState.equippedInventory[SlotsEnum.ARMOR]));

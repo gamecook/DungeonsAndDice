@@ -30,10 +30,11 @@ package com.gamecook.dungeonsanddice.views
         private function createDisplay():void
         {
             //Need to make sure the level is padded by a space so it always is aligned with right side of level bar
-            label = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='grey'>Next Level</span>               <span class='grey'>Level</span><span class='white'> "+state.playerLevel+"</span>", 150)) as TextField;
+            label = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='grey'>Next Level</span>               <span class='grey'>Level</span><span class='white'> "+state.getPlayerLevel()+"</span>", 150)) as TextField;
 
-            //TODO need to calculate the correct next level percentage
-            var percent:Number = .5;
+            var levelDifference:int = state.calculateExperiencePoints(state.getPlayerLevel()+1) - state.calculateExperiencePoints(state.getPlayerLevel());
+            var currentLevelEXP:int = state.getPlayerExperience() - state.calculateExperiencePoints(state.getPlayerLevel());
+            var percent:Number = currentLevelEXP/levelDifference;
             var maxWidth:int = 133;
             var maxHeight:int = 10;
             var border:int = 2;

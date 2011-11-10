@@ -12,7 +12,9 @@ package com.gamecook.dungeonsanddice.activities
     import com.flashartofwar.ui.Slider;
     import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
     import com.gamecook.frogue.enum.SlotsEnum;
-    import com.gamecook.frogue.sprites.SpriteSheet;
+import com.gamecook.frogue.maps.RandomMap;
+import com.gamecook.frogue.renderer.MapDrawingRenderer;
+import com.gamecook.frogue.sprites.SpriteSheet;
     import com.gamecook.frogue.tiles.TileTypes;
     import com.gamecook.dungeonsanddice.factories.SpriteFactory;
     import com.gamecook.dungeonsanddice.factories.SpriteSheetFactory;
@@ -24,7 +26,8 @@ package com.gamecook.dungeonsanddice.activities
 
     import flash.display.Bitmap;
     import flash.display.BitmapData;
-    import flash.display.Sprite;
+import flash.display.Shape;
+import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
     import flash.geom.ColorTransform;
@@ -65,13 +68,21 @@ import flash.text.TextField;
             textFieldStamp.sharpness = 200;
             textFieldStamp.embedFonts = true;
             textFieldStamp.defaultTextFormat = TextFieldFactory.textFormatSmall;
-            textFieldStamp.background = true;
-            textFieldStamp.backgroundColor = 0x000000;
+            textFieldStamp.background = false;
+
+            // Draw bottom black box
+            var bottomMask:Shape = addChild(new Shape()) as Shape;
+            bottomMask.graphics.beginFill(0);
+            bottomMask.graphics.drawRect(0,0,fullSizeWidth - HUD_WIDTH, 50);
+            bottomMask.graphics.endFill();
+            bottomMask.x = HUD_WIDTH;
+            bottomMask.y = fullSizeHeight - bottomMask.height;
 
             scrollerContainer = addChild(new Sprite()) as Sprite;
 
 
             offset = 55;
+
 
             createScrubber();
             //Generate Bitmap Data
@@ -148,12 +159,12 @@ import flash.text.TextField;
             var inventoryWidth:int = BACKGROUND_WIDTH - 20;
             var columns:int = 1;
             var rows:int = Math.ceil(total / columns);
-
+            var cellHeight:int = SpriteSheetFactory.TILE_SIZE + 20;
             // calculate left/right margin for each item
             var leftMargin:int = 0;
             var rightMargin:int = 30;
 
-            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((SpriteSheetFactory.TILE_SIZE + padding) * rows) + 10, true, 0);
+            var currentPage:BitmapData = new BitmapData(inventoryWidth, ((cellHeight + padding) * rows) + 10, true, 0);
             var currentColumn:int = 0;
             var currentRow:int = 0;
             var foundColorMatrix:ColorTransform = new ColorTransform();
@@ -168,23 +179,35 @@ import flash.text.TextField;
             textFieldStamp.styleSheet = styles;
 
             var spriteName:String;
+            var playerLevel:int = activeState.getPlayerLevel();
+            var locked:Boolean;
+            var map:RandomMap = new RandomMap();
+            var mapShape:Shape = new Shape();
+            var renderer:MapDrawingRenderer = new MapDrawingRenderer(mapShape.graphics, new Rectangle(0,0,4,4));
 
             for (i = 0; i < total; i++)
             {
                 currentColumn = i % columns;
 
+                map.generateMap(16,1);
+                renderer.renderMap(map);
+                trace("map", map);
+
+
                 spriteName = "M"+(i+1);
                 var matrix:Matrix = new Matrix();
 
                 newX = (currentColumn * (SpriteSheetFactory.TILE_SIZE + padding + rightMargin) + leftMargin);
-                newY = (currentRow * (SpriteSheetFactory.TILE_SIZE + padding)) + 5;
+                newY = (currentRow * (SpriteSheetFactory.TILE_SIZE + 20 + padding)) + 5;
 
                 matrix.translate(newX, newY);
 
                 instancesRects[spriteName] = new Rectangle(newX, newY, 200, 40);
 
+                locked = (i > playerLevel);
+
                 // test if item is found
-                /*if (unlockedEquipment.indexOf(sprites[i]) == -1)
+                if (locked)
                 {
                     foundColorMatrix.blueOffset =
                     foundColorMatrix.redOffset =
@@ -195,15 +218,21 @@ import flash.text.TextField;
                     foundColorMatrix.blueOffset =
                     foundColorMatrix.redOffset =
                     foundColorMatrix.greenOffset = 0;
-                    unlocked ++;
-                }*/
 
+                }
+
+                currentPage.draw(mapShape, matrix);
+
+                textFieldStamp.htmlText = "Dungeon "+(i+1)+" "+(!locked ? "Unlocked" : "Locked")+"\n<span class='grey'>Monster: "+TileTypes.getTileName(spriteName)+"s</span>";
+
+                matrix.translate(mapShape.width + 5, 0);
+                currentPage.draw(textFieldStamp, matrix, foundColorMatrix);
+
+                matrix.translate(0, textFieldStamp.height+2);
                 currentPage.draw(spriteSheet.getSprite(TileTypes.getTileSprite(spriteName)), matrix, foundColorMatrix);
 
-                textFieldStamp.htmlText = "Dungeon "+(i+1)+" unlocked\n<span class='grey'>Monster: "+TileTypes.getTileName(spriteName)+"s</span>";
-
                 matrix.translate(SpriteSheetFactory.TILE_SIZE + 5, 0);
-                currentPage.draw(textFieldStamp, matrix, foundColorMatrix);
+                currentPage.draw(spriteSheet.getSprite(TileTypes.getTileSprite("C3")), matrix, foundColorMatrix);
 
                 if (currentColumn == columns - 1)
                 {

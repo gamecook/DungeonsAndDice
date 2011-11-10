@@ -49,10 +49,16 @@ package com.gamecook.dungeonsanddice.activities
         private var offset:int = 55;
         private var statsTF:TextField;
         private var inventoryPreview:InventoryPreviewView;
+        private var lastActivity:Class;
 
         public function InventoryActivity(activityManager:IActivityManager, data:*)
         {
             super(activityManager, data);
+            if(data)
+            {
+                if(data.hasOwnProperty("lastActivity"));
+                    lastActivity = data.lastActivity;
+            }
         }
 
 
@@ -106,7 +112,7 @@ package com.gamecook.dungeonsanddice.activities
 
             addEventListener(MouseEvent.CLICK, onClick);
 
-            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Simply click on any of the equipment to customize your player.</span>",150)) as TextField
+            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>Simply click on any of the equipment to customize your player. Clicking on a potion will restore your health.</span>",150)) as TextField
 
             instructionText.x = (HUD_WIDTH - instructionText.width) * .5;
             instructionText.y = HUD_MESSAGE_Y + 5;
@@ -121,7 +127,10 @@ package com.gamecook.dungeonsanddice.activities
 
         override protected function onContextualButtonClick(event:MouseEvent):void
         {
-            activityManager.back();
+            if(lastActivity)
+                nextActivity(lastActivity)
+            else
+                activityManager.back();
         }
 
         private function formatStatsText():String

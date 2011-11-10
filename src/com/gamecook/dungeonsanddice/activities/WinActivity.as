@@ -65,16 +65,13 @@ package com.gamecook.dungeonsanddice.activities
         }
 
 
-        override public function onStart():void
-        {
-            super.onStart();
-
-            activeState.increaseTotalWins();
+        override protected function onCreate():void {
+            super.onCreate();
 
             //TODO need to update player stats and save out state.
             var youWin:Bitmap = addChild(Bitmap(new YouWinImage())) as Bitmap;
             youWin.x = ((BACKGROUND_WIDTH - youWin.width) * .5) + HUD_WIDTH;
-            youWin.y = 0;
+            youWin.y = 50;
 
             treasureChest = addChild(new PaperSprite()) as PaperSprite;
             treasureChest.x = ((BACKGROUND_WIDTH - treasureChest.width) * .5) + HUD_WIDTH;
@@ -106,18 +103,18 @@ package com.gamecook.dungeonsanddice.activities
 
             treasureTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmallCenter, "You have discovered a treasure chest.", 200)) as TextField;
             treasureTF.x = ((BACKGROUND_WIDTH - treasureTF.width) * .5) + HUD_WIDTH;
-            treasureTF.y = treasureChest.y + treasureChest.height - 20;
+            treasureTF.y = treasureChest.y + treasureChest.height - 10;
 
-            bonusTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, formatBonusText(), 160)) as TextField;
-            bonusTF.x = ((BACKGROUND_WIDTH - bonusTF.width) * .5) + HUD_WIDTH;
-            bonusTF.y = treasureTF.y + treasureTF.height + 10;
+            bonusTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLarge, formatBonusText(), 250)) as TextField;
+            bonusTF.x = HUD_PADDING-2;
+            bonusTF.y = 45;
 
-            scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, "SCORE\n<span class='green'>" +TextFieldFactory.padScore(), 160)) as TextField;
-            //scoreTF.textColor = 0x33ff00;
+            scoreTF = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatLargeCenter, "<span class='white'>Score: </span> <span class='green'>" +TextFieldFactory.padScore(), 160)) as TextField;
             scoreTF.x = ((BACKGROUND_WIDTH - scoreTF.width) * .5) + HUD_WIDTH;
-            scoreTF.y = bonusTF.y + bonusTF.height + 10;
+            scoreTF.y = treasureTF.y + treasureTF.height + 20;
 
             activeState.score = generateNewScore();
+            activeState.increasePlayerExperience(activeState.getPlayerLevel() * 5);
 
             // Add event listener to activity for click.
             addEventListener(MouseEvent.CLICK, onClick);
@@ -130,6 +127,18 @@ package com.gamecook.dungeonsanddice.activities
             countUpEffect = new CountUpTextEffect(scoreTF, null, onCountUpComplete);
             countUpEffect.resetValues(activeState.score, activeState.initialScore, 1, scoreTF.text);
             addThread(countUpEffect);
+
+            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>The Hero has defeated the Monster.</span>",150)) as TextField
+            instructionText.x = (HUD_WIDTH - instructionText.width) * .5;
+            instructionText.y = HUD_MESSAGE_Y + 5;
+        }
+
+        override public function onStart():void
+        {
+            super.onStart();
+
+            activeState.increaseTotalWins();
+
 
         }
 
@@ -154,21 +163,21 @@ package com.gamecook.dungeonsanddice.activities
 
         private function generateNewScore():int
         {
+            //TODO Need a new way to calculate score.
             var score:int = 0;
-
             score += activeState.playerLife;
             score += activeState.levelTurns;
-            score *= activeState.playerLevel;
+            score *= activeState.dungeonLevel;
 
             return score + activeState.score;
         }
 
         private function formatBonusText():String
         {
-            var message:String = "SUCCESS BONUS\n" +
+            var message:String = "Success Bonus\n" +
                     "<span class='lightGrey'>Life:</span> <span class='orange'>+" + activeState.playerLife + "</span>\n" +
                     "<span class='lightGrey'>Turns:</span> <span class='orange'>+" + activeState.levelTurns + "</span>\n" +
-                    "<span class='lightGrey'>Level:</span> <span class='orange'>x" + activeState.playerLevel + "</span>";
+                    "<span class='lightGrey'>EXP:</span> <span class='orange'>+" + activeState.getPlayerLevel() * 5 + "</span>";
 
             return message;
         }
@@ -183,7 +192,7 @@ package com.gamecook.dungeonsanddice.activities
             }
             else
             {
-                activeState.playerLevel ++;
+                activeState.dungeonLevel ++;
                 soundManager.destroySounds(true);
                 soundManager.play(MHSoundClasses.WalkStairsSound);
                 nextActivity(GameActivity);

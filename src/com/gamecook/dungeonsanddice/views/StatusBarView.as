@@ -46,7 +46,7 @@ package com.gamecook.dungeonsanddice.views
         private var _message:TextField;
         private var state:ActiveGameState;
         private var nextLevel:DisplayObject;
-        private var inventoryPreview:Sprite;
+        public var inventoryPreview:InventoryPreviewView;
         private var spriteSheet:SpriteSheet;
 
         public function StatusBarView(state:ActiveGameState)
@@ -60,13 +60,14 @@ package com.gamecook.dungeonsanddice.views
             //TODO remove Test Data
             state.playerClass = "Player Class";
             state.playerName  = "Player Name";
-            state.playerLevel  = 99;
+            //state.playerLevel  = 1;
+            state.increasePlayerExperience(100);
 
             playerLabel = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>"+state.playerName + "</span>  <span class='grey'>"+state.playerClass+"</span>", 150)) as TextField;
             nextLevel = addChild(new NextLevelView(state));
             nextLevel.y = playerLabel.y + playerLabel.height;
 
-            inventoryPreview = addChild(new InventoryPreviewView(state)) as Sprite;
+            inventoryPreview = addChild(new InventoryPreviewView(state)) as InventoryPreviewView;
             inventoryPreview.y = nextLevel.y + nextLevel.height + 5;
 
             _message = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "", 150)) as TextField;

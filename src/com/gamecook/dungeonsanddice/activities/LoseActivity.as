@@ -89,13 +89,17 @@ package com.gamecook.dungeonsanddice.activities
 
             // Clear out the rest of the activeState values since the game is over.
             activeState.reset();
+
+            var instructionText:TextField = addChild(TextFieldFactory.createTextField(TextFieldFactory.textFormatSmall, "<span class='white'>The Hero has been defeated by the Monster. Better luck next time.</span>",150)) as TextField
+            instructionText.x = (HUD_WIDTH - instructionText.width) * .5;
+            instructionText.y = HUD_MESSAGE_Y + 5;
         }
 
         private function formatBonusText():String
         {
             var message:String = "GAME STATS\n" +
                     /*"<span class='orange'>Difficulty:</span> <span class='orange'>" + DifficultyLevels.getLabel(activeState.difficulty) + "</span>\n" +*/
-                    "<span class='lightGrey'>Level:</span> <span class='orange'>" + activeState.playerLevel + "-"+DifficultyLevels.getLabel(activeState.difficulty).substr(0,1).toUpperCase()+"</span>\n"+
+                    "<span class='lightGrey'>Level:</span> <span class='orange'>" + activeState.dungeonLevel + "-"+DifficultyLevels.getLabel(activeState.difficulty).substr(0,1).toUpperCase()+"</span>\n"+
                     "<span class='lightGrey'>Total Turns:</span> <span class='orange'>" + activeState.levelTurns + "</span>\n" +
                     "<span class='lightGrey'>Best Bonus:</span> <span class='orange'>x" + activeState.bestBonus+"</span>";
 
